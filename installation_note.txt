@@ -5,3 +5,11 @@
 3. create app: npx create-react-app my-app --template typescript
 
 4. install packages:
+npm install tailwindcss postcss autoprefixer
+npm install express cors fs path
+
+create a file called: tailwind.config.js
+
+
+for running app: npm start
+for running server: node server/server.js
