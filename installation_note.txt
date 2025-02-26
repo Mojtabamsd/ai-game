@@ -1,0 +1,5 @@
+1. set node for powershell terminal: search in Setting node and set node environment --> C:\Users\mojmas\AppData\Roaming\JetBrains\WebStorm2024.3\node\versions\22.14.0\node.exe
+
+2. install python env using webstorm interface
+
+3.
