@@ -6,7 +6,7 @@
 
 4. install packages:
 npm install tailwindcss postcss autoprefixer
-npm install express cors fs path
+npm install express cors fs path react-router-dom
 
 create a file called: tailwind.config.js
 
