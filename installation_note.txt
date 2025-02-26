@@ -11,5 +11,6 @@ npm install express cors fs path
 create a file called: tailwind.config.js
 
 
-for running app: npm start
-for running server: node server/server.js
+5. for running app: npm start
+for running server: first go  cd .\my-app\       then node server/server.js
+
