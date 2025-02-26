@@ -2,4 +2,6 @@
 
 2. install python env using webstorm interface
 
-3.
+3. create app: npx create-react-app my-app --template typescript
+
+4. install packages:
