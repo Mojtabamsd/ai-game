@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 const categories = ["Copepods", "Diatoms", "Jellyfish", "Detritus"];
 
@@ -46,30 +47,32 @@ const TeachingPage = () => {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-6">
+        <div className="container text-center mt-5">
             {!showQuiz ? (
                 step < categories.length ? (
                     <>
-                        <h2 className="text-2xl font-bold mb-4">Learn About: {categories[step]}</h2>
-                        <img src={`/dataset/${categories[step]}/image1.png`} alt={categories[step]} className="w-60 h-60 object-cover border rounded mb-4" />
-                        <button onClick={() => setStep(step + 1)} className="px-4 py-2 bg-green-500 text-white rounded">Next</button>
+                        <h2 className="mb-4">Learn About: {categories[step]}</h2>
+                        <img src={`/dataset/${categories[step]}/image1.png`} alt={categories[step]} className="img-fluid border rounded mb-4" style={{ width: "300px", height: "300px" }} />
+                        <button onClick={() => setStep(step + 1)} className="btn btn-success">Next</button>
                     </>
                 ) : null
             ) : (
                 <>
-                    <h2 className="text-2xl font-bold mb-4">Which category is this?</h2>
-                    {quizImage && <img src={quizImage} alt="Quiz Example" className="w-60 h-60 object-cover border rounded mb-4" />}
-                    <div className="grid grid-cols-2 gap-4">
+                    <h2 className="mb-4">Which category is this?</h2>
+                    {quizImage && <img src={quizImage} alt="Quiz Example" className="img-fluid border rounded mb-4" style={{ width: "300px", height: "300px" }} />}
+                    <div className="row justify-content-center">
                         {categories.map((category) => (
-                            <button key={category} onClick={() => checkAnswer(category)} className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700">
-                                {category}
-                            </button>
+                            <div className="col-6 col-md-3 mb-2" key={category}>
+                                <button onClick={() => checkAnswer(category)} className="btn btn-primary w-100">
+                                    {category}
+                                </button>
+                            </div>
                         ))}
                     </div>
-                    {feedback && <p className="mt-4 text-lg font-semibold">{feedback}</p>}
+                    {feedback && <p className="mt-4 fw-bold">{feedback}</p>}
                 </>
             )}
-            <Link to="/" className="mt-4 px-4 py-2 bg-red-500 text-white rounded">Back to Main Menu</Link>
+            <Link to="/" className="btn btn-danger mt-4">Back to Main Menu</Link>
         </div>
     );
 };

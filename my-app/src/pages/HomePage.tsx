@@ -1,19 +1,20 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 const HomePage = () => {
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-6">
-            <h1 className="text-3xl font-bold mb-6">AI Learning Platform</h1>
-            <div className="grid grid-cols-1 gap-6">
-                <Link to="/teaching" className="px-6 py-4 bg-blue-500 text-white rounded text-xl hover:bg-blue-700 text-center">
+        <div className="container text-center mt-5">
+            <h1 className="mb-4">AI Learning Platform</h1>
+            <div className="d-grid gap-3 col-6 mx-auto">
+                <Link to="/teaching" className="btn btn-primary btn-lg">
                     Teaching
                 </Link>
-                <Link to="/training" className="px-6 py-4 bg-gray-400 text-white rounded text-xl hover:bg-gray-600 text-center">
-                    Training a Classifier (Coming Soon)
+                <Link to="/training" className="btn btn-primary btn-lg">
+                    Training a Classifier
                 </Link>
-                <Link to="/prediction" className="px-6 py-4 bg-gray-400 text-white rounded text-xl hover:bg-gray-600 text-center">
-                    AI Classifier Prediction (Coming Soon)
+                <Link to="/prediction" className="btn btn-primary btn-lg">
+                    AI Classifier Prediction
                 </Link>
             </div>
         </div>
