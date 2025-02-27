@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import "./TrainingPage.css";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 const categories = ["Copepods", "Diatoms", "Jellyfish", "Detritus"];
 
@@ -41,24 +41,24 @@ const TrainingPage = () => {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-6">
-            <h1 className="text-3xl font-bold mb-6">Training: Drag Images into Categories</h1>
+        <div className="container text-center mt-5">
+            <h1 className="mb-4">Training: Drag Images into Categories</h1>
 
-            <div className="flex gap-6 mb-6">
+            <div className="row mb-4">
                 {categories.map((category) => (
                     <div
                         key={category}
-                        className="w-48 h-48 border-2 border-dashed flex items-center justify-center text-center text-gray-500"
+                        className="col-md-3 border border-primary rounded p-3 text-center bg-light"
                         onDragOver={(e) => e.preventDefault()}
                         onDrop={() => handleDrop(category)}
                     >
-                        {category}
-                        <div className="mt-2 text-sm">{sortedImages[category]?.length || 0} images</div>
+                        <h5>{category}</h5>
+                        <p className="text-muted">{sortedImages[category]?.length || 0} images</p>
                     </div>
                 ))}
             </div>
 
-            <div className="flex gap-4">
+            <div className="d-flex flex-wrap justify-content-center gap-2">
                 {trainingImages.map((img, index) => (
                     <img
                         key={index}
@@ -66,12 +66,13 @@ const TrainingPage = () => {
                         alt="Training"
                         draggable
                         onDragStart={() => handleDragStart(img.image)}
-                        className="w-24 h-24 object-cover border rounded cursor-pointer"
+                        className="img-thumbnail"
+                        style={{ width: "100px", height: "100px", cursor: "grab" }}
                     />
                 ))}
             </div>
 
-            <Link to="/" className="mt-6 px-4 py-2 bg-red-500 text-white rounded">Back to Main Menu</Link>
+            <Link to="/" className="btn btn-danger mt-4">Back to Main Menu</Link>
         </div>
     );
 };

@@ -5,7 +5,16 @@
 3. create app: npx create-react-app my-app --template typescript
 
 4. install packages:
-npm install tailwindcss postcss autoprefixer
+install tailwindcss or bootstrap:
+    v4: npm install tailwindcss postcss autoprefixer
+    v3: npm install -D tailwindcss@3 postcss autoprefixer (more info https://www.fdaytalk.com/npx-tailwindcss-init-npm-error-could-not-determine-executable-to-run/)
+    npx tailwindcss init -p
+
+    or
+
+    npm install bootstrap
+
+
 npm install express cors fs path react-router-dom
 
 create a file called: tailwind.config.js
