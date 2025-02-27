@@ -8,6 +8,8 @@ const TrainingPage = () => {
     const [trainingImages, setTrainingImages] = useState<{ image: string, category: string }[]>([]);
     const [draggedImage, setDraggedImage] = useState<string | null>(null);
     const [sortedImages, setSortedImages] = useState<{ [key: string]: string[] }>({});
+    const [isTraining, setIsTraining] = useState(false);
+    const [trainingResult, setTrainingResult] = useState<string | null>(null);
 
     useEffect(() => {
         fetchTrainingImages();
@@ -38,6 +40,24 @@ const TrainingPage = () => {
             setTrainingImages(trainingImages.filter(img => img.image !== draggedImage));
             setDraggedImage(null);
         }
+    };
+
+    const startTraining = async () => {
+        setIsTraining(true);
+        setTrainingResult(null);
+        try {
+            const response = await fetch("http://localhost:5000/start-training", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ sortedImages })
+            });
+            const data = await response.json();
+            setTrainingResult(`Training completed! Accuracy: ${data.accuracy}%`);
+        } catch (error) {
+            console.error("Error starting training:", error);
+            setTrainingResult("Training failed. Please try again.");
+        }
+        setIsTraining(false);
     };
 
     return (
@@ -71,6 +91,16 @@ const TrainingPage = () => {
                     />
                 ))}
             </div>
+
+            <button
+                className="btn btn-success mt-4"
+                onClick={startTraining}
+                disabled={isTraining}
+            >
+                {isTraining ? "Training..." : "Start Training"}
+            </button>
+
+            {trainingResult && <p className="mt-3 fw-bold">{trainingResult}</p>}
 
             <Link to="/" className="btn btn-danger mt-4">Back to Main Menu</Link>
         </div>
