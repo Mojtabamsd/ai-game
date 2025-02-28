@@ -13,9 +13,6 @@ const HomePage = () => {
                 <Link to="/training" className="btn btn-primary btn-lg">
                     Training a Classifier
                 </Link>
-                <Link to="/prediction" className="btn btn-primary btn-lg">
-                    AI Classifier Prediction
-                </Link>
             </div>
         </div>
     );
