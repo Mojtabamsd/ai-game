@@ -131,8 +131,10 @@ const TrainingPage = () => {
                         </div>
                     </>
                 ) : (
-                    <div className="score-container text-white d-flex align-items-center justify-content-center">
+                    <div className="score-container text-white d-flex flex-column align-items-center justify-content-center">
                         <h1 className="display-3 fw-bold score-text">{trainingResult}</h1>
+                        <button className="btn btn-primary btn-lg mt-4" onClick={() => window.location.reload()}>Try Again</button>
+                        <Link to="/" className="btn btn-danger btn-lg mt-2">Exit</Link>
                     </div>
                 )}
                 {!isTraining && !trainingResult && (
