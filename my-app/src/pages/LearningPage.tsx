@@ -4,7 +4,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 const categories = ["Copepods", "Diatoms", "Jellyfish", "Detritus"];
 
-const TeachingPage = () => {
+const LearningPage = () => {
     const [step, setStep] = useState(0);
     const [showQuiz, setShowQuiz] = useState(false);
     const [quizImage, setQuizImage] = useState<string | null>(null);
@@ -77,4 +77,4 @@ const TeachingPage = () => {
     );
 };
 
-export default TeachingPage;
+export default LearningPage;
