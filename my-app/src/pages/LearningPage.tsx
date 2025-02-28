@@ -17,17 +17,7 @@ const LearningPage = () => {
     const [quizImage, setQuizImage] = useState<string | null>(null);
     const [quizAnswer, setQuizAnswer] = useState<string | null>(null);
     const [feedback, setFeedback] = useState<string | null>(null);
-    const [username, setUsername] = useState<string | null>(null);
     const navigate = useNavigate();
-
-    useEffect(() => {
-        const storedUsername = localStorage.getItem("username");
-        if (!storedUsername) {
-            navigate("/");
-        } else {
-            setUsername(storedUsername);
-        }
-    }, [navigate]);
 
     useEffect(() => {
         if (step >= categories.length) {
@@ -72,20 +62,19 @@ const LearningPage = () => {
             backgroundAttachment: "fixed"
         }}>
             <div className="learning-container text-center p-4">
-                <h2 className="mb-4 text-white">Hello, {username}! Welcome to Learning Plankton</h2>
                 {!showQuiz ? (
                     step < categories.length ? (
                         <>
-                            <h2 className="mb-4 text-white">Learn About: {categories[step]}</h2>
-                            <img src={`/dataset/${categories[step]}/image1.png`} alt={categories[step]} className="img-fluid border rounded mb-4" style={{ width: "300px", height: "300px" }} />
-                            <p className="text-white">{categoryDescriptions[categories[step]]}</p>
+                            <h2 className="mb-4 text-white">{categories[step]}</h2>
+                            <p className="text-white mb-4">{categoryDescriptions[categories[step]]}</p>
+                            <img src={`/dataset/${categories[step]}/image1.png`} alt={categories[step]} className="img-fluid border rounded mb-4" style={{ width: "500px", height: "500px" }} />
                             <button onClick={() => setStep(step + 1)} className="btn btn-success btn-lg">Next</button>
                         </>
                     ) : null
                 ) : (
                     <>
                         <h2 className="mb-4 text-white">Which category is this?</h2>
-                        {quizImage && <img src={quizImage} alt="Quiz Example" className="img-fluid border rounded mb-4" style={{ width: "300px", height: "300px" }} />}
+                        {quizImage && <img src={quizImage} alt="Quiz Example" className="img-fluid border rounded mb-4" style={{ width: "500px", height: "500px" }} />}
                         <div className="row justify-content-center">
                             {categories.map((category) => (
                                 <div className="col-6 col-md-3 mb-2" key={category}>
