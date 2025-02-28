@@ -12,6 +12,7 @@ const TrainingPage = () => {
     const [isTraining, setIsTraining] = useState(false);
     const [trainingResult, setTrainingResult] = useState<string | null>(null);
     const [username, setUsername] = useState<string | null>(null);
+    const [timer, setTimer] = useState(20);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -26,6 +27,15 @@ const TrainingPage = () => {
     useEffect(() => {
         fetchTrainingImages();
     }, []);
+
+    useEffect(() => {
+        if (timer > 0) {
+            const countdown = setTimeout(() => setTimer(timer - 1), 1000);
+            return () => clearTimeout(countdown);
+        } else {
+            startTraining();
+        }
+    }, [timer]);
 
     const fetchTrainingImages = async () => {
         try {
@@ -59,21 +69,23 @@ const TrainingPage = () => {
     };
 
     const startTraining = async () => {
-        setIsTraining(true);
-        setTrainingResult(null);
-        try {
-            const response = await fetch("http://localhost:5000/start-training", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ sortedImages })
-            });
-            const data = await response.json();
-            setTrainingResult(`Training completed! Accuracy: ${data.accuracy}%`);
-        } catch (error) {
-            console.error("Error starting training:", error);
-            setTrainingResult("Training failed. Please try again.");
+        if (!isTraining) {
+            setIsTraining(true);
+            setTrainingResult(null);
+            try {
+                const response = await fetch("http://localhost:5000/start-training", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ sortedImages })
+                });
+                const data = await response.json();
+                setTrainingResult(`Training completed! Accuracy: ${data.accuracy}%`);
+            } catch (error) {
+                console.error("Error starting training:", error);
+                setTrainingResult("Training failed. Please try again.");
+            }
+            setIsTraining(false);
         }
-        setIsTraining(false);
     };
 
     return (
@@ -85,6 +97,7 @@ const TrainingPage = () => {
         }}>
             <div className="training-container text-center p-5">
                 <h2 className="mb-4 text-white">{username}, drag and drop images to each category</h2>
+                <h3 className="text-warning">Time Left: {timer}s</h3>
 
                 <div className="row mb-4">
                     {categories.map((category) => (
