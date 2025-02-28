@@ -20,6 +20,19 @@ const LearningPage = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
+        if (step < categories.length) {
+            speakText(categoryDescriptions[categories[step]]);
+        }
+    }, [step]);
+
+    const speakText = (text: string) => {
+        window.speechSynthesis.cancel(); // Stop any ongoing speech
+        const speech = new SpeechSynthesisUtterance(text);
+        speech.lang = "en-US";
+        window.speechSynthesis.speak(speech);
+    };
+
+    useEffect(() => {
         if (step >= categories.length) {
             startQuiz();
         }
