@@ -84,7 +84,7 @@ const TrainingPage = () => {
             backgroundAttachment: "fixed"
         }}>
             <div className="training-container text-center p-5">
-                <h1 className="mb-4 text-white">Hello, {username}! Welcome to AI Training</h1>
+                <h2 className="mb-4 text-white">{username}, drag and drop images to each category</h2>
 
                 <div className="row mb-4">
                     {categories.map((category) => (
