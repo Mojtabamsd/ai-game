@@ -13,6 +13,7 @@ const TrainingPage = () => {
     const [trainingResult, setTrainingResult] = useState<string | null>(null);
     const [username, setUsername] = useState<string | null>(null);
     const [timer, setTimer] = useState(20);
+    const [timerActive, setTimerActive] = useState(true);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -29,13 +30,13 @@ const TrainingPage = () => {
     }, []);
 
     useEffect(() => {
-        if (timer > 0) {
+        if (timer > 0 && timerActive) {
             const countdown = setTimeout(() => setTimer(timer - 1), 1000);
             return () => clearTimeout(countdown);
-        } else {
+        } else if (timer === 0 && timerActive) {
             startTraining();
         }
-    }, [timer]);
+    }, [timer, timerActive]);
 
     const fetchTrainingImages = async () => {
         try {
@@ -71,6 +72,7 @@ const TrainingPage = () => {
     const startTraining = async () => {
         if (!isTraining) {
             setIsTraining(true);
+            setTimerActive(false); // Disable timer to prevent duplicate training
             setTrainingResult("Training...");
             try {
                 const response = await fetch("http://localhost:5000/start-training", {
