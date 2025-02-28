@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 const categories = ["Copepods", "Diatoms", "Jellyfish", "Detritus"];
@@ -10,6 +10,17 @@ const TrainingPage = () => {
     const [sortedImages, setSortedImages] = useState<{ [key: string]: string[] }>({});
     const [isTraining, setIsTraining] = useState(false);
     const [trainingResult, setTrainingResult] = useState<string | null>(null);
+    const [username, setUsername] = useState<string | null>(null);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const storedUsername = localStorage.getItem("username");
+        if (!storedUsername) {
+            navigate("/");
+        } else {
+            setUsername(storedUsername);
+        }
+    }, [navigate]);
 
     useEffect(() => {
         fetchTrainingImages();
@@ -62,7 +73,7 @@ const TrainingPage = () => {
 
     return (
         <div className="container text-center mt-5">
-            <h1 className="mb-4">Training: Drag Images into Categories</h1>
+            <h1 className="mb-4">Hello, {username}! Welcome to Training AI</h1>
 
             <div className="row mb-4">
                 {categories.map((category) => (
@@ -102,7 +113,7 @@ const TrainingPage = () => {
 
             {trainingResult && <p className="mt-3 fw-bold">{trainingResult}</p>}
 
-            <Link to="/" className="btn btn-danger mt-4">Back to Main Menu</Link>
+            <Link to="/main-menu" className="btn btn-danger mt-4">Back to Main Menu</Link>
         </div>
     );
 };

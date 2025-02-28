@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 const categories = ["Copepods", "Diatoms", "Jellyfish", "Detritus"];
@@ -10,6 +10,17 @@ const LearningPage = () => {
     const [quizImage, setQuizImage] = useState<string | null>(null);
     const [quizAnswer, setQuizAnswer] = useState<string | null>(null);
     const [feedback, setFeedback] = useState<string | null>(null);
+    const [username, setUsername] = useState<string | null>(null);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const storedUsername = localStorage.getItem("username");
+        if (!storedUsername) {
+            navigate("/");
+        } else {
+            setUsername(storedUsername);
+        }
+    }, [navigate]);
 
     useEffect(() => {
         if (step >= categories.length) {
@@ -48,6 +59,7 @@ const LearningPage = () => {
 
     return (
         <div className="container text-center mt-5">
+            <h2 className="mb-4">Hello, {username}! Welcome to Learning Plankton</h2>
             {!showQuiz ? (
                 step < categories.length ? (
                     <>
@@ -72,7 +84,7 @@ const LearningPage = () => {
                     {feedback && <p className="mt-4 fw-bold">{feedback}</p>}
                 </>
             )}
-            <Link to="/" className="btn btn-danger mt-4">Back to Main Menu</Link>
+            <Link to="/main-menu" className="btn btn-danger mt-4">Back to Main Menu</Link>
         </div>
     );
 };
