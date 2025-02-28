@@ -23,7 +23,7 @@ const MainMenu = () => {
 
     return (
         <div className="main-menu d-flex align-items-center justify-content-center vh-100" style={{
-            backgroundImage: "url('/images/ocean-background.jpg')",
+            backgroundImage: "url('/images/main-background.jpg')",
             backgroundSize: "cover",
             backgroundPosition: "center",
             backgroundAttachment: "fixed"

@@ -16,7 +16,7 @@ const StartPage = () => {
 
     return (
         <div className="start-page d-flex align-items-center justify-content-center vh-100" style={{
-            backgroundImage: "url('/images/amy-humphries-2M_sDJ_agvs-unsplash.jpg')",
+            backgroundImage: "url('/images/start-background.jpg')",
             backgroundSize: "cover",
             backgroundPosition: "center",
             backgroundAttachment: "fixed"
