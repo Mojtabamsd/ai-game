@@ -21,15 +21,22 @@ const LearningPage = () => {
 
     useEffect(() => {
         if (step < categories.length) {
+            stopSpeaking();
             speakText(categoryDescriptions[categories[step]]);
         }
     }, [step]);
 
     const speakText = (text: string) => {
-        window.speechSynthesis.cancel(); // Stop any ongoing speech
-        const speech = new SpeechSynthesisUtterance(text);
-        speech.lang = "en-US";
-        window.speechSynthesis.speak(speech);
+        stopSpeaking(); // Stop any ongoing speech
+        if (text) {
+            const speech = new SpeechSynthesisUtterance(text);
+            speech.lang = "en-US";
+            window.speechSynthesis.speak(speech);
+        }
+    };
+
+    const stopSpeaking = () => {
+        window.speechSynthesis.cancel();
     };
 
     useEffect(() => {
@@ -40,6 +47,7 @@ const LearningPage = () => {
 
     const startQuiz = async () => {
         setShowQuiz(true);
+        stopSpeaking();
         loadNewQuizImage();
     };
 
