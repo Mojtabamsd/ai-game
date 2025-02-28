@@ -10,8 +10,10 @@ body {
 }
 
 .learning-container {
-    background: rgba(0, 0, 0, 0.7);
-    backdrop-filter: blur(20px);
+    /*background: rgba(245, 245, 245, 0.85);*/
+    /*background: rgba(220, 220, 220, 0.85);*/
+    background: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(25px);
     border-radius: 30px;
     padding: 60px;
     max-width: 800px;
