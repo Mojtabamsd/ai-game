@@ -75,6 +75,11 @@ const LearningPage = () => {
         }, 2000);
     };
 
+    const handleBackToMainMenu = () => {
+        stopSpeaking();
+        navigate("/main-menu");
+    };
+
     return (
         <div className="learning-page d-flex align-items-center justify-content-center vh-100" style={{
             backgroundImage: "url('/images/learning-background.jpg')",
@@ -108,7 +113,7 @@ const LearningPage = () => {
                         {feedback && <p className="mt-4 fw-bold text-white">{feedback}</p>}
                     </>
                 )}
-                <Link to="/main-menu" className="btn btn-danger btn-lg mt-4">Back to Main Menu</Link>
+                <button onClick={handleBackToMainMenu} className="btn btn-danger btn-lg mt-4">Back to Main Menu</button>
             </div>
         </div>
     );
