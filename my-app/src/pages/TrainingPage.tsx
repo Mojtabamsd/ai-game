@@ -71,7 +71,7 @@ const TrainingPage = () => {
     const startTraining = async () => {
         if (!isTraining) {
             setIsTraining(true);
-            setTrainingResult(null);
+            setTrainingResult("Training...");
             try {
                 const response = await fetch("http://localhost:5000/start-training", {
                     method: "POST",
@@ -79,7 +79,7 @@ const TrainingPage = () => {
                     body: JSON.stringify({ sortedImages })
                 });
                 const data = await response.json();
-                setTrainingResult(`Training completed! Accuracy: ${data.accuracy}%`);
+                setTrainingResult(`Accuracy: ${data.accuracy}%`);
             } catch (error) {
                 console.error("Error starting training:", error);
                 setTrainingResult("Training failed. Please try again.");
@@ -95,49 +95,50 @@ const TrainingPage = () => {
             backgroundPosition: "center",
             backgroundAttachment: "fixed"
         }}>
-            <div className="training-container text-center p-5">
-                <h2 className="mb-4 text-white">{username}, drag and drop images to each category</h2>
-                <h3 className="text-warning">Time Left: {timer}s</h3>
-
-                <div className="row mb-4">
-                    {categories.map((category) => (
-                        <div
-                            key={category}
-                            className="col-md-3 border border-warning rounded p-4 text-center bg-dark text-white"
-                            onDragOver={(e) => e.preventDefault()}
-                            onDrop={() => handleDrop(category)}
-                        >
-                            <h5>{category}</h5>
-                            <p>{sortedImages[category]?.length || 0} images</p>
+            <div className={`training-container text-center p-5 ${isTraining ? "blurred" : ""}`}>
+                {!isTraining && !trainingResult ? (
+                    <>
+                        <h2 className="mb-4 text-white">{username}, drag and drop images to each category</h2>
+                        <h3 className="text-warning">Time Left: {timer}s</h3>
+                        <div className="row mb-4">
+                            {categories.map((category) => (
+                                <div
+                                    key={category}
+                                    className="col-md-3 border border-warning rounded p-4 text-center bg-dark text-white"
+                                    onDragOver={(e) => e.preventDefault()}
+                                    onDrop={() => handleDrop(category)}
+                                >
+                                    <h5>{category}</h5>
+                                    <p>{sortedImages[category]?.length || 0} images</p>
+                                </div>
+                            ))}
                         </div>
-                    ))}
-                </div>
 
-                <div className="d-flex flex-wrap justify-content-center gap-3">
-                    {trainingImages.map((img, index) => (
-                        <img
-                            key={index}
-                            src={img.image}
-                            alt="Training"
-                            draggable
-                            onDragStart={() => handleDragStart(img.image)}
-                            className="img-thumbnail shadow-lg rounded"
-                            style={{ width: "120px", height: "120px", cursor: "grab" }}
-                        />
-                    ))}
-                </div>
-
-                <button
-                    className="btn btn-success btn-lg mt-4"
-                    onClick={startTraining}
-                    disabled={isTraining}
-                >
-                    {isTraining ? "Training..." : "Start Training"}
-                </button>
-
-                {trainingResult && <p className="mt-3 fw-bold text-white">{trainingResult}</p>}
-
-                <Link to="/main-menu" className="btn btn-danger btn-lg mt-4">Back to Main Menu</Link>
+                        <div className="d-flex flex-wrap justify-content-center gap-3">
+                            {trainingImages.map((img, index) => (
+                                <img
+                                    key={index}
+                                    src={img.image}
+                                    alt="Training"
+                                    draggable
+                                    onDragStart={() => handleDragStart(img.image)}
+                                    className="img-thumbnail shadow-lg rounded"
+                                    style={{ width: "120px", height: "120px", cursor: "grab" }}
+                                />
+                            ))}
+                        </div>
+                    </>
+                ) : (
+                    <div className="score-container text-white d-flex align-items-center justify-content-center">
+                        <h1 className="display-3 fw-bold score-text">{trainingResult}</h1>
+                    </div>
+                )}
+                {!isTraining && !trainingResult && (
+                    <button className="btn btn-success btn-lg mt-4" onClick={startTraining} disabled={isTraining}>
+                        Start Training
+                    </button>
+                )}
+                {!isTraining && !trainingResult && <Link to="/main-menu" className="btn btn-danger btn-lg mt-4">Back to Main Menu</Link>}
             </div>
         </div>
     );
