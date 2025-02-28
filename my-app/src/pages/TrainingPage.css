@@ -1,0 +1,63 @@
+body {
+    font-family: 'Poppins', sans-serif;
+}
+
+.training-page {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.training-container {
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(20px);
+    border-radius: 30px;
+    padding: 60px;
+    max-width: 800px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.3);
+}
+
+.training-box {
+    border: 3px dashed #ffc107;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+    transition: all 0.3s ease;
+    min-height: 150px;
+}
+
+.training-box:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.training-image {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 10px;
+    cursor: grab;
+    transition: transform 0.2s ease;
+}
+
+.training-image:active {
+    transform: scale(1.1);
+}
+
+.training-button {
+    font-size: 20px;
+    padding: 15px;
+    border-radius: 12px;
+    width: 100%;
+    min-width: 300px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.training-button:hover {
+    transform: scale(1.1);
+    background-color: #28a745;
+    color: white;
+}

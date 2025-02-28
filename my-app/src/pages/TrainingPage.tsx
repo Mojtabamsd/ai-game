@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
+import "./TrainingPage.css";
 
 const categories = ["Copepods", "Diatoms", "Jellyfish", "Detritus"];
 
@@ -32,16 +33,15 @@ const TrainingPage = () => {
             const data = await response.json();
             if (data.images) {
                 const updatedImages = data.images.map((img: { image: string, category: string }) => ({
-                    image: `/dataset/train/${img.category}/${img.image.split("/").pop()}`, // Ensure correct path
+                    image: `/dataset/train/${img.category}/${img.image.split("/").pop()}`,
                     category: img.category
                 }));
-                setTrainingImages(updatedImages.slice(0, 10)); // Show 10 random images
+                setTrainingImages(updatedImages.slice(0, 10));
             }
         } catch (error) {
             console.error("Error fetching training images:", error);
         }
     };
-
 
     const handleDragStart = (image: string) => {
         setDraggedImage(image);
@@ -77,48 +77,55 @@ const TrainingPage = () => {
     };
 
     return (
-        <div className="container text-center mt-5">
-            <h1 className="mb-4">Hello, {username}! Welcome to Training AI</h1>
+        <div className="training-page d-flex align-items-center justify-content-center vh-100" style={{
+            backgroundImage: "url('/images/training-background.jpg')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundAttachment: "fixed"
+        }}>
+            <div className="training-container text-center p-5">
+                <h1 className="mb-4 text-white">Hello, {username}! Welcome to AI Training</h1>
 
-            <div className="row mb-4">
-                {categories.map((category) => (
-                    <div
-                        key={category}
-                        className="col-md-3 border border-primary rounded p-3 text-center bg-light"
-                        onDragOver={(e) => e.preventDefault()}
-                        onDrop={() => handleDrop(category)}
-                    >
-                        <h5>{category}</h5>
-                        <p className="text-muted">{sortedImages[category]?.length || 0} images</p>
-                    </div>
-                ))}
+                <div className="row mb-4">
+                    {categories.map((category) => (
+                        <div
+                            key={category}
+                            className="col-md-3 border border-warning rounded p-4 text-center bg-dark text-white"
+                            onDragOver={(e) => e.preventDefault()}
+                            onDrop={() => handleDrop(category)}
+                        >
+                            <h5>{category}</h5>
+                            <p>{sortedImages[category]?.length || 0} images</p>
+                        </div>
+                    ))}
+                </div>
+
+                <div className="d-flex flex-wrap justify-content-center gap-3">
+                    {trainingImages.map((img, index) => (
+                        <img
+                            key={index}
+                            src={img.image}
+                            alt="Training"
+                            draggable
+                            onDragStart={() => handleDragStart(img.image)}
+                            className="img-thumbnail shadow-lg rounded"
+                            style={{ width: "120px", height: "120px", cursor: "grab" }}
+                        />
+                    ))}
+                </div>
+
+                <button
+                    className="btn btn-success btn-lg mt-4"
+                    onClick={startTraining}
+                    disabled={isTraining}
+                >
+                    {isTraining ? "Training..." : "Start Training"}
+                </button>
+
+                {trainingResult && <p className="mt-3 fw-bold text-white">{trainingResult}</p>}
+
+                <Link to="/main-menu" className="btn btn-danger btn-lg mt-4">Back to Main Menu</Link>
             </div>
-
-            <div className="d-flex flex-wrap justify-content-center gap-2">
-                {trainingImages.map((img, index) => (
-                    <img
-                        key={index}
-                        src={img.image}
-                        alt="Training"
-                        draggable
-                        onDragStart={() => handleDragStart(img.image)}
-                        className="img-thumbnail"
-                        style={{ width: "100px", height: "100px", cursor: "grab" }}
-                    />
-                ))}
-            </div>
-
-            <button
-                className="btn btn-success mt-4"
-                onClick={startTraining}
-                disabled={isTraining}
-            >
-                {isTraining ? "Training..." : "Start Training"}
-            </button>
-
-            {trainingResult && <p className="mt-3 fw-bold">{trainingResult}</p>}
-
-            <Link to="/main-menu" className="btn btn-danger mt-4">Back to Main Menu</Link>
         </div>
     );
 };
