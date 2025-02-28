@@ -5,7 +5,6 @@ import numpy as np
 import joblib
 from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score
-
 import sys
 
 # Read input arguments
@@ -13,29 +12,34 @@ training_data_path = sys.argv[1]
 model_output_path = sys.argv[2]
 test_data_path = sys.argv[3]
 
+# Define base dataset directory
+BASE_DATASET_PATH = os.path.join(os.path.dirname(__file__), "../public")
+
 # Load user-sorted training data
 with open(training_data_path, "r") as f:
     sorted_images = json.load(f)
 
 # Feature extraction function
 def extract_features(image_path):
-    img = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+    full_image_path = os.path.join(BASE_DATASET_PATH, image_path.lstrip("/"))
+    img = cv2.imread(full_image_path, cv2.IMREAD_GRAYSCALE)
 
     if img is None:
-        print(f"Error: Could not read image {image_path}")  # Debugging
+        print(f"Error: Could not read image {full_image_path}")  # Debugging
         return None  # Skip bad images
 
     img = cv2.resize(img, (64, 64))
     return img.flatten()
-
 
 # Prepare training dataset
 X_train, y_train = [], []
 categories = list(sorted_images.keys())
 for label, category in enumerate(categories):
     for image_path in sorted_images[category]:
-        X_train.append(extract_features(image_path))
-        y_train.append(label)
+        features = extract_features(image_path)
+        if features is not None:  # Skip invalid images
+            X_train.append(features)
+            y_train.append(label)
 
 # Train classifier
 clf = SVC(kernel="linear", probability=True)
