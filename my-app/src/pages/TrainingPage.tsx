@@ -31,12 +31,17 @@ const TrainingPage = () => {
             const response = await fetch("http://localhost:5000/random-images");
             const data = await response.json();
             if (data.images) {
-                setTrainingImages(data.images.slice(0, 10)); // Show 10 random images
+                const updatedImages = data.images.map((img: { image: string, category: string }) => ({
+                    image: `/dataset/train/${img.category}/${img.image.split("/").pop()}`, // Ensure correct path
+                    category: img.category
+                }));
+                setTrainingImages(updatedImages.slice(0, 10)); // Show 10 random images
             }
         } catch (error) {
             console.error("Error fetching training images:", error);
         }
     };
+
 
     const handleDragStart = (image: string) => {
         setDraggedImage(image);

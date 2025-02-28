@@ -14,8 +14,8 @@ const DATASET_PATH_TEST = path.join(__dirname, "../public/dataset/test");
 const MODEL_PATH = path.join(__dirname, "../server/plankton_classifier.pkl");
 
 // Function to get a random image from a category
-const getRandomImage = (category) => {
-    const categoryPath = path.join(DATASET_PATH, category);
+const getRandomImage = (category, datasetPath) => {
+    const categoryPath = path.join(datasetPath, category);
     if (!fs.existsSync(categoryPath)) return null;
 
     const images = fs.readdirSync(categoryPath).filter(file => file.endsWith(".png"));
@@ -34,7 +34,7 @@ app.get("/random-image", (req, res) => {
     if (categories.length === 0) return res.json({ error: "No categories found" });
 
     const randomCategory = categories[Math.floor(Math.random() * categories.length)];
-    const randomImagePath = getRandomImage(randomCategory);
+    const randomImagePath = getRandomImage(randomCategory, DATASET_PATH);
 
     if (!randomImagePath) return res.json({ error: "No images found in category" });
 
@@ -43,8 +43,8 @@ app.get("/random-image", (req, res) => {
 
 // API Endpoint: Get 10 random images (For Training Page)
 app.get("/random-images", (req, res) => {
-    const categories = fs.readdirSync(DATASET_PATH).filter(folder =>
-        fs.statSync(path.join(DATASET_PATH, folder)).isDirectory()
+    const categories = fs.readdirSync(DATASET_PATH_TRAIN).filter(folder =>
+        fs.statSync(path.join(DATASET_PATH_TRAIN, folder)).isDirectory()
     );
 
     if (categories.length === 0) return res.json({ error: "No categories found" });
@@ -52,7 +52,7 @@ app.get("/random-images", (req, res) => {
     let trainingImages = [];
     for (let i = 0; i < 10; i++) { // Get 10 images
         const randomCategory = categories[Math.floor(Math.random() * categories.length)];
-        const imageObj = getRandomImage(randomCategory);
+        const imageObj = getRandomImage(randomCategory, DATASET_PATH_TRAIN);
         if (imageObj) trainingImages.push(imageObj);
     }
 
@@ -71,10 +71,8 @@ app.post("/start-training", (req, res) => {
     const trainingDataPath = path.join(__dirname, "../server/training_data.json");
     fs.writeFileSync(trainingDataPath, JSON.stringify(sortedImages, null, 2));
 
-
-        const pythonPath = path.join(__dirname, "../../.venv/Scripts/python");
-        exec(`"${pythonPath}" server/train_model.py "${trainingDataPath}" "${MODEL_PATH}" "${DATASET_PATH_TEST}"`, (error, stdout, stderr) => {
-
+    const pythonPath = path.join(__dirname, "../../.venv/Scripts/python");
+    exec(`"${pythonPath}" server/train_model.py "${trainingDataPath}" "${MODEL_PATH}" "${DATASET_PATH_TEST}"`, (error, stdout, stderr) => {
         if (error) {
             console.error(`Error training model: ${stderr}`);
             return res.status(500).json({ error: "Training failed" });
