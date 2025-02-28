@@ -1,0 +1,38 @@
+body {
+    font-family: 'Poppins', sans-serif;
+}
+
+.learning-page {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.learning-container {
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(15px);
+    border-radius: 25px;
+    padding: 50px;
+    max-width: 500px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0px 8px 12px rgba(0, 0, 0, 0.2);
+}
+
+.learning-button {
+    transition: all 0.3s ease;
+    font-size: 24px;
+    padding: 20px;
+    border-radius: 12px;
+    width: 100%;
+    min-width: 250px;
+    text-align: center;
+    display: block;
+}
+
+.learning-button:hover {
+    transform: scale(1.1);
+    background-color: #0056b3;
+    color: white;
+}

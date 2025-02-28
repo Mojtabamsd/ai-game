@@ -1,8 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
+import "./LearningPage.css";
 
 const categories = ["Copepods", "Diatoms", "Jellyfish", "Detritus"];
+const categoryDescriptions: { [key: string]: string } = {
+    "Copepods": "Copepods are small crustaceans found in nearly every freshwater and saltwater habitat. They play a crucial role in the marine food web.",
+    "Diatoms": "Diatoms are microscopic algae with silica cell walls. They are responsible for a large portion of the oxygen we breathe.",
+    "Jellyfish": "Jellyfish are gelatinous marine animals that use their tentacles to capture prey. Some species can deliver painful stings.",
+    "Detritus": "Detritus consists of decomposing organic material in the ocean. It provides nutrients for microorganisms and small marine animals."
+};
 
 const LearningPage = () => {
     const [step, setStep] = useState(0);
@@ -58,33 +65,41 @@ const LearningPage = () => {
     };
 
     return (
-        <div className="container text-center mt-5">
-            <h2 className="mb-4">Hello, {username}! Welcome to Learning Plankton</h2>
-            {!showQuiz ? (
-                step < categories.length ? (
+        <div className="learning-page d-flex align-items-center justify-content-center vh-100" style={{
+            backgroundImage: "url('/images/learning-background.jpg')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundAttachment: "fixed"
+        }}>
+            <div className="learning-container text-center p-4">
+                <h2 className="mb-4 text-white">Hello, {username}! Welcome to Learning Plankton</h2>
+                {!showQuiz ? (
+                    step < categories.length ? (
+                        <>
+                            <h2 className="mb-4 text-white">Learn About: {categories[step]}</h2>
+                            <img src={`/dataset/${categories[step]}/image1.png`} alt={categories[step]} className="img-fluid border rounded mb-4" style={{ width: "300px", height: "300px" }} />
+                            <p className="text-white">{categoryDescriptions[categories[step]]}</p>
+                            <button onClick={() => setStep(step + 1)} className="btn btn-success btn-lg">Next</button>
+                        </>
+                    ) : null
+                ) : (
                     <>
-                        <h2 className="mb-4">Learn About: {categories[step]}</h2>
-                        <img src={`/dataset/${categories[step]}/image1.png`} alt={categories[step]} className="img-fluid border rounded mb-4" style={{ width: "300px", height: "300px" }} />
-                        <button onClick={() => setStep(step + 1)} className="btn btn-success">Next</button>
+                        <h2 className="mb-4 text-white">Which category is this?</h2>
+                        {quizImage && <img src={quizImage} alt="Quiz Example" className="img-fluid border rounded mb-4" style={{ width: "300px", height: "300px" }} />}
+                        <div className="row justify-content-center">
+                            {categories.map((category) => (
+                                <div className="col-6 col-md-3 mb-2" key={category}>
+                                    <button onClick={() => checkAnswer(category)} className="btn btn-primary btn-lg w-100">
+                                        {category}
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                        {feedback && <p className="mt-4 fw-bold text-white">{feedback}</p>}
                     </>
-                ) : null
-            ) : (
-                <>
-                    <h2 className="mb-4">Which category is this?</h2>
-                    {quizImage && <img src={quizImage} alt="Quiz Example" className="img-fluid border rounded mb-4" style={{ width: "300px", height: "300px" }} />}
-                    <div className="row justify-content-center">
-                        {categories.map((category) => (
-                            <div className="col-6 col-md-3 mb-2" key={category}>
-                                <button onClick={() => checkAnswer(category)} className="btn btn-primary w-100">
-                                    {category}
-                                </button>
-                            </div>
-                        ))}
-                    </div>
-                    {feedback && <p className="mt-4 fw-bold">{feedback}</p>}
-                </>
-            )}
-            <Link to="/main-menu" className="btn btn-danger mt-4">Back to Main Menu</Link>
+                )}
+                <Link to="/main-menu" className="btn btn-danger btn-lg mt-4">Back to Main Menu</Link>
+            </div>
         </div>
     );
 };
