@@ -96,7 +96,7 @@ const TrainingPage = () => {
                 await fetch("http://localhost:5000/save-score", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ username, accuracy })
+                    body: JSON.stringify({ username, accuracy, overwrite: true })
                 });
             } catch (error) {
                 console.error("Error starting training:", error);
