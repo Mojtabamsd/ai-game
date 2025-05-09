@@ -83,19 +83,28 @@ app.post("/start-training", (req, res) => {
     });
 });
 
-
 app.post("/save-score", (req, res) => {
-    const { username, accuracy } = req.body;
-    if (!username || accuracy === undefined) return res.status(400).json({ error: "Missing data" });
+    const { username, accuracy, overwrite } = req.body;
+    if (!username || accuracy === undefined) {
+        return res.status(400).json({ error: "Missing data" });
+    }
 
     let scores = [];
     if (fs.existsSync(SCORES_PATH)) {
         scores = JSON.parse(fs.readFileSync(SCORES_PATH));
     }
 
-    scores.push({ username, accuracy, timestamp: new Date().toISOString() });
+    const existingIndex = scores.findIndex(entry => entry.username === username);
 
-    // Sort and keep top 10
+    if (existingIndex !== -1) {
+        const existing = scores[existingIndex];
+        if (overwrite && accuracy > existing.accuracy) {
+            scores[existingIndex] = { username, accuracy, timestamp: new Date().toISOString() };
+        }
+    } else {
+        scores.push({ username, accuracy, timestamp: new Date().toISOString() });
+    }
+
     scores.sort((a, b) => b.accuracy - a.accuracy);
     scores = scores.slice(0, 10);
 
