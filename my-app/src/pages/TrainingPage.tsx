@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./TrainingPage.css";
 
-const categories = ["Copepods", "Diatoms", "Jellyfish", "Detritus"];
+const categories = ["Copepods", "Aulatractus", "Cnidaria", "Detritus"];
 
 const TrainingPage = () => {
     const [trainingImages, setTrainingImages] = useState<{ image: string, category: string }[]>([]);
@@ -12,7 +12,7 @@ const TrainingPage = () => {
     const [isTraining, setIsTraining] = useState(false);
     const [trainingResult, setTrainingResult] = useState<string | null>(null);
     const [username, setUsername] = useState<string | null>(null);
-    const [timer, setTimer] = useState(20);
+    const [timer, setTimer] = useState(50);
     const [timerActive, setTimerActive] = useState(true);
     const navigate = useNavigate();
 
@@ -47,7 +47,7 @@ const TrainingPage = () => {
                     image: `/dataset/train/${img.category}/${img.image.split("/").pop()}`,
                     category: img.category
                 }));
-                setTrainingImages(updatedImages.slice(0, 10));
+                setTrainingImages(updatedImages.slice(0, 25));
             }
         } catch (error) {
             console.error("Error fetching training images:", error);

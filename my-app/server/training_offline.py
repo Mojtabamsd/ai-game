@@ -7,7 +7,7 @@ from sklearn.model_selection import train_test_split
 
 # Define dataset path
 DATASET_PATH_TRAIN = "../public/dataset/train"
-CATEGORIES = ["Copepods", "Diatoms", "Jellyfish", "Detritus"]
+CATEGORIES = ["Copepods", "Aulatractus", "Cnidaria", "Detritus"]
 
 # Feature extraction function
 def extract_features(image_path):

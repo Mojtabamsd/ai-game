@@ -3,11 +3,11 @@ import { Link, useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./LearningPage.css";
 
-const categories = ["Copepods", "Diatoms", "Jellyfish", "Detritus"];
+const categories = ["Copepods", "Aulatractus", "Cnidaria", "Detritus"];
 const categoryDescriptions: { [key: string]: string } = {
     "Copepods": "Copepods are small crustaceans found in nearly every freshwater and saltwater habitat. They play a crucial role in the marine food web.",
-    "Diatoms": "Diatoms are microscopic algae with silica cell walls. They are responsible for a large portion of the oxygen we breathe.",
-    "Jellyfish": "Jellyfish are gelatinous marine animals that use their tentacles to capture prey. Some species can deliver painful stings.",
+    "Aulatractus": "Aulatractus are microscopic algae with silica cell walls. They are responsible for a large portion of the oxygen we breathe.",
+    "Cnidaria": "Cnidaria are gelatinous marine animals that use their tentacles to capture prey. Some species can deliver painful stings.",
     "Detritus": "Detritus consists of decomposing organic material in the ocean. It provides nutrients for microorganisms and small marine animals."
 };
 

@@ -50,7 +50,7 @@ app.get("/random-images", (req, res) => {
     if (categories.length === 0) return res.json({ error: "No categories found" });
 
     let trainingImages = [];
-    for (let i = 0; i < 10; i++) { // Get 10 images
+    for (let i = 0; i < 100; i++) { // Get 10 images
         const randomCategory = categories[Math.floor(Math.random() * categories.length)];
         const imageObj = getRandomImage(randomCategory, DATASET_PATH_TRAIN);
         if (imageObj) trainingImages.push(imageObj);
