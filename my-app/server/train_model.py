@@ -6,6 +6,7 @@ import joblib
 from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score
 import sys
+from feature_uvpec import feature_uvpec
 
 # Read input arguments
 training_data_path = sys.argv[1]
@@ -28,8 +29,10 @@ def extract_features(image_path):
         print(f"Error: Could not read image {full_image_path}")  # Debugging
         return None  # Skip bad images
 
-    img = cv2.resize(img, (64, 64))
-    return img.flatten()
+    img = cv2.resize(img, (128, 128))
+    feature_dict = feature_uvpec(img, image_path)
+    feature_arr = np.array(list(feature_dict.values()))
+    return feature_arr
 
 # Prepare training dataset
 X_train, y_train = [], []
