@@ -1,17 +1,31 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "./StartPage.css"; // Ensure this file exists in the same directory
+import "./StartPage.css";
 
 const StartPage = () => {
     const [username, setUsername] = useState("");
+    const [existingUsernames, setExistingUsernames] = useState<string[]>([]);
+    const [error, setError] = useState("");
     const navigate = useNavigate();
 
+    useEffect(() => {
+        fetch("http://localhost:5000/top-scores")
+            .then(res => res.json())
+            .then(data => setExistingUsernames(data.map((entry: { username: string }) => entry.username)));
+    }, []);
+
     const handleLogin = () => {
-        if (username.trim() !== "") {
-            localStorage.setItem("username", username);
-            navigate("/main-menu");
+        if (username.trim() === "") {
+            setError("Please enter a name.");
+            return;
         }
+        if (existingUsernames.includes(username.trim())) {
+            setError("Name already used. Please try another.");
+            return;
+        }
+        localStorage.setItem("username", username.trim());
+        navigate("/main-menu");
     };
 
     return (
@@ -29,11 +43,15 @@ const StartPage = () => {
                     className="form-control mb-3"
                     placeholder="Enter your name"
                     value={username}
-                    onChange={(e) => setUsername(e.target.value)}
+                    onChange={(e) => {
+                        setUsername(e.target.value);
+                        setError("");
+                    }}
                 />
                 <button className="btn btn-primary start-button w-100" onClick={handleLogin}>
                     Start Game
                 </button>
+                {error && <p className="text-danger mt-2">{error}</p>}
             </div>
         </div>
     );
