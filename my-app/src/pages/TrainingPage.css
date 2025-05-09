@@ -78,3 +78,50 @@ body {
     text-align: center;
     z-index: 10;
 }
+
+.score-container {
+    /*background-color: rgba(100, 1, 0, 0.7);*/
+    border-radius: 20px;
+    padding: 40px;
+    text-align: center;
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.3);
+    max-width: 800px;
+    width: 100%;
+}
+
+.score-text {
+    font-size: 3rem;
+    color: #007bff;
+}
+
+.leaderboard {
+    background: #f9f9f9;
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 20px;
+    box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.1);
+}
+
+.leaderboard h4 {
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.leaderboard .list-group-item {
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    border: none;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.leaderboard .list-group-item:last-child {
+    border-bottom: none;
+}
+
+.btn-primary, .btn-danger {
+    min-width: 200px;
+}
+
+

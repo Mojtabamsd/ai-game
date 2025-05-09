@@ -106,7 +106,7 @@ app.post("/save-score", (req, res) => {
     }
 
     scores.sort((a, b) => b.accuracy - a.accuracy);
-    scores = scores.slice(0, 10);
+    scores = scores.slice(0, 6);
 
     fs.writeFileSync(SCORES_PATH, JSON.stringify(scores, null, 2));
     res.json({ success: true });
