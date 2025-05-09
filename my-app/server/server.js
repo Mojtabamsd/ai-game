@@ -3,6 +3,7 @@ const fs = require("fs");
 const path = require("path");
 const cors = require("cors");
 const { exec } = require("child_process");
+const SCORES_PATH = path.join(__dirname, "training_scores.json");
 
 const app = express();
 app.use(cors());
@@ -81,6 +82,34 @@ app.post("/start-training", (req, res) => {
         res.json({ accuracy: parseFloat(stdout.trim()) });
     });
 });
+
+
+app.post("/save-score", (req, res) => {
+    const { username, accuracy } = req.body;
+    if (!username || accuracy === undefined) return res.status(400).json({ error: "Missing data" });
+
+    let scores = [];
+    if (fs.existsSync(SCORES_PATH)) {
+        scores = JSON.parse(fs.readFileSync(SCORES_PATH));
+    }
+
+    scores.push({ username, accuracy, timestamp: new Date().toISOString() });
+
+    // Sort and keep top 10
+    scores.sort((a, b) => b.accuracy - a.accuracy);
+    scores = scores.slice(0, 10);
+
+    fs.writeFileSync(SCORES_PATH, JSON.stringify(scores, null, 2));
+    res.json({ success: true });
+});
+
+app.get("/top-scores", (req, res) => {
+    const SCORES_PATH = path.join(__dirname, "training_scores.json");
+    if (!fs.existsSync(SCORES_PATH)) return res.json([]);
+    const scores = JSON.parse(fs.readFileSync(SCORES_PATH));
+    res.json(scores);
+});
+
 
 // Start server
 const PORT = 5000;

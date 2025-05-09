@@ -14,6 +14,7 @@ const TrainingPage = () => {
     const [username, setUsername] = useState<string | null>(null);
     const [timer, setTimer] = useState(50);
     const [timerActive, setTimerActive] = useState(true);
+    const [topScores, setTopScores] = useState<{ username: string; accuracy: number }[]>([]);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -37,6 +38,14 @@ const TrainingPage = () => {
             startTraining();
         }
     }, [timer, timerActive]);
+
+    useEffect(() => {
+        if (trainingResult) {
+            fetch("http://localhost:5000/top-scores")
+                .then(res => res.json())
+                .then(data => setTopScores(data));
+        }
+    }, [trainingResult]);
 
     const fetchTrainingImages = async () => {
         try {
@@ -72,7 +81,7 @@ const TrainingPage = () => {
     const startTraining = async () => {
         if (!isTraining) {
             setIsTraining(true);
-            setTimerActive(false); // Disable timer to prevent duplicate training
+            setTimerActive(false);
             setTrainingResult("Training...");
             try {
                 const response = await fetch("http://localhost:5000/start-training", {
@@ -81,7 +90,14 @@ const TrainingPage = () => {
                     body: JSON.stringify({ sortedImages })
                 });
                 const data = await response.json();
-                setTrainingResult(`Accuracy: ${data.accuracy}%`);
+                const accuracy = parseFloat(data.accuracy);
+                setTrainingResult(`Accuracy: ${accuracy}%`);
+
+                await fetch("http://localhost:5000/save-score", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ username, accuracy })
+                });
             } catch (error) {
                 console.error("Error starting training:", error);
                 setTrainingResult("Training failed. Please try again.");
@@ -133,8 +149,23 @@ const TrainingPage = () => {
                 ) : (
                     <div className="score-container text-white d-flex flex-column align-items-center justify-content-center">
                         <h1 className="display-3 fw-bold score-text">{trainingResult}</h1>
-                        <button className="btn btn-primary btn-lg mt-4" onClick={() => window.location.reload()}>Try Again</button>
-                        <Link to="/" className="btn btn-danger btn-lg mt-2">Exit</Link>
+
+                        {topScores.length > 0 && (
+                            <div className="leaderboard bg-white text-dark p-4 rounded mt-4 w-75">
+                                <h4 className="mb-3">Top Scores</h4>
+                                <ul className="list-group">
+                                    {topScores.map((entry, idx) => (
+                                        <li key={idx} className="list-group-item d-flex justify-content-between">
+                                            <span>{entry.username}</span>
+                                            <span>{entry.accuracy}%</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+
+                        <button className="btn btn-primary btn-lg mt-4" onClick={() => window.location.reload()}>Train Again</button>
+                        <Link to="/" className="btn btn-danger btn-lg mt-2">Exit to Start Page</Link>
                     </div>
                 )}
                 {!isTraining && !trainingResult && (
