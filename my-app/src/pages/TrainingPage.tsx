@@ -56,7 +56,7 @@ const TrainingPage = () => {
                     image: `/dataset/train/${img.category}/${img.image.split("/").pop()}`,
                     category: img.category
                 }));
-                setTrainingImages(updatedImages.slice(0, 25));
+                setTrainingImages(updatedImages.slice(0, 32));
             }
         } catch (error) {
             console.error("Error fetching training images:", error);
