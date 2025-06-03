@@ -8,7 +8,7 @@ from feature_uvpec import feature_uvpec
 
 # Define dataset path
 DATASET_PATH_TRAIN = "../public/dataset/train"
-CATEGORIES = ["Copepods", "Aulatractus", "Cnidaria", "Detritus"]
+CATEGORIES = ["Copepods", "Foraminifera", "Cnidaria", "Detritus"]
 
 # Feature extraction function
 def extract_features(image_path):

@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./TrainingPage.css";
 
-const categories = ["Copepods", "Aulatractus", "Cnidaria", "Detritus"];
+const categories = ["Copepods", "Foraminifera", "Cnidaria", "Detritus"];
 
 const TrainingPage = () => {
     const [trainingImages, setTrainingImages] = useState<{ image: string, category: string }[]>([]);

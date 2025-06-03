@@ -3,12 +3,12 @@ import { Link, useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./LearningPage.css";
 
-const categories = ["Copepods", "Aulatractus", "Cnidaria", "Detritus"];
+const categories = ["Copepods", "Foraminifera", "Cnidaria", "Detritus"];
 const categoryDescriptions: { [key: string]: string } = {
-    "Copepods": "Copepods are small crustaceans found in nearly every freshwater and saltwater habitat. They play a crucial role in the marine food web.",
-    "Aulatractus": "Aulatractus are microscopic algae with silica cell walls. They are responsible for a large portion of the oxygen we breathe.",
-    "Cnidaria": "Cnidaria are gelatinous marine animals that use their tentacles to capture prey. Some species can deliver painful stings.",
-    "Detritus": "Detritus consists of decomposing organic material in the ocean. It provides nutrients for microorganisms and small marine animals."
+    "Copepods": "Tiny crustaceans and the most numerous animals in the ocean! Copepods are the \"insects of the sea\" fast, abundant, and vital food for fish, whales, and seabirds.",
+    "Foraminifera": "Single-celled organisms with beautiful, shell-like structures. These \"living sand grains\" help scientists study past climates from the seafloor.",
+    "Cnidaria": "This group includes jellyfish and other gelatinous drifters. With stinging cells and graceful movements, they’re both mesmerizing and mysterious.",
+    "Detritus": "Marine snow! Made of dead plankton, waste, and organic debris, detritus drifts down the water column and feeds life in the deep sea."
 };
 
 const LearningPage = () => {
