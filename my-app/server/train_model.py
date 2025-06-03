@@ -30,7 +30,9 @@ def extract_features(image_path):
         return None  # Skip bad images
 
     img = cv2.resize(img, (128, 128))
-    feature_dict = feature_uvpec(img, image_path)
+    max_value = np.iinfo(img.dtype).max
+    inverted_array = max_value - img
+    feature_dict = feature_uvpec(inverted_array, image_path)
     feature_arr = np.array(list(feature_dict.values()))
     return feature_arr
 

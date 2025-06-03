@@ -92,7 +92,7 @@ const LearningPage = () => {
                     step < categories.length ? (
                         <>
                             <h2 className="mb-4 text-white">{categories[step]}</h2>
-                            <p className="text-white mb-4">{categoryDescriptions[categories[step]]}</p>
+                            <p className="category-description">{categoryDescriptions[categories[step]]}</p>
                             <img src={`/dataset/${categories[step]}/image1.png`} alt={categories[step]} className="img-fluid border rounded mb-4" style={{ width: "500px", height: "500px" }} />
                             <button onClick={() => setStep(step + 1)} className="btn btn-success btn-lg">Next</button>
                         </>

@@ -52,3 +52,11 @@ body {
     background-color: #0056b3;
     color: white;
 }
+
+.category-description {
+    font-size: 1.5rem;
+    color: #f9e79f; /* soft yellow, or use another color you like */
+    font-weight: 500;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
