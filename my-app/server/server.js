@@ -34,13 +34,19 @@ app.get("/random-image", (req, res) => {
 
     if (categories.length === 0) return res.json({ error: "No categories found" });
 
-    const randomCategory = categories[Math.floor(Math.random() * categories.length)];
-    const randomImagePath = getRandomImage(randomCategory, DATASET_PATH);
+    // Try up to 10 times to get a valid image
+    for (let i = 0; i < 10; i++) {
+        const randomCategory = categories[Math.floor(Math.random() * categories.length)];
+        const imageObj = getRandomImage(randomCategory, DATASET_PATH);
+        if (imageObj) {
+            return res.json(imageObj);
+        }
+    }
 
-    if (!randomImagePath) return res.json({ error: "No images found in category" });
-
-    res.json(randomImagePath);
+    console.warn("No valid images found after 10 tries");
+    return res.json({ error: "No images found in any category" });
 });
+
 
 app.get("/random-images", (req, res) => {
     const targetTotal = 32;
