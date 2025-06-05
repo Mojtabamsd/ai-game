@@ -12,7 +12,7 @@ const TrainingPage = () => {
     const [isTraining, setIsTraining] = useState(false);
     const [trainingResult, setTrainingResult] = useState<string | null>(null);
     const [username, setUsername] = useState<string | null>(null);
-    const [timer, setTimer] = useState(50);
+    const [timer, setTimer] = useState(40);
     const [timerActive, setTimerActive] = useState(true);
     const [topScores, setTopScores] = useState<{ username: string; accuracy: number }[]>([]);
     const navigate = useNavigate();

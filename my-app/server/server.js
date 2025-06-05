@@ -42,7 +42,6 @@ app.get("/random-image", (req, res) => {
     res.json(randomImagePath);
 });
 
-// API Endpoint: Get 10 random images (For Training Page)
 app.get("/random-images", (req, res) => {
     const categories = fs.readdirSync(DATASET_PATH_TRAIN).filter(folder =>
         fs.statSync(path.join(DATASET_PATH_TRAIN, folder)).isDirectory()
@@ -50,17 +49,26 @@ app.get("/random-images", (req, res) => {
 
     if (categories.length === 0) return res.json({ error: "No categories found" });
 
-    let trainingImages = [];
-    for (let i = 0; i < 100; i++) { // Get 100 images
-        const randomCategory = categories[Math.floor(Math.random() * categories.length)];
-        const imageObj = getRandomImage(randomCategory, DATASET_PATH_TRAIN);
-        if (imageObj) trainingImages.push(imageObj);
-    }
+    // Collect all image paths
+    let allImages = [];
+    categories.forEach(category => {
+        const categoryPath = path.join(DATASET_PATH_TRAIN, category);
+        const files = fs.readdirSync(categoryPath).filter(file => file.endsWith(".png"));
+        files.forEach(file => {
+            allImages.push({
+                image: `/dataset/train/${category}/${file}`,
+                category: category
+            });
+        });
+    });
 
-    if (trainingImages.length === 0) return res.json({ error: "No images found in any category" });
+    // Shuffle and pick first N unique images
+    const shuffleArray = arr => arr.sort(() => 0.5 - Math.random());
+    const uniqueImages = shuffleArray(allImages).slice(0, 100);
 
-    res.json({ images: trainingImages });
+    res.json({ images: uniqueImages });
 });
+
 
 // API Endpoint: Start training with user-sorted data
 app.post("/start-training", (req, res) => {
