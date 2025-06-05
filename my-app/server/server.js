@@ -43,32 +43,54 @@ app.get("/random-image", (req, res) => {
 });
 
 app.get("/random-images", (req, res) => {
-    const categories = fs.readdirSync(DATASET_PATH_TRAIN).filter(folder =>
+    const targetTotal = 32;
+    const half = targetTotal / 2;
+    const categories = ["Copepods", "Foraminifera", "Cnidaria", "Detritus"];
+
+    const selectedImages = new Set();
+    const guaranteedImages = [];
+
+    // Step 1: Pick equal number from each category
+    const perCategoryCount = half / categories.length;
+
+    for (const category of categories) {
+        const categoryPath = path.join(DATASET_PATH_TRAIN, category);
+        if (!fs.existsSync(categoryPath)) continue;
+
+        const files = fs.readdirSync(categoryPath).filter(file => file.endsWith(".png"));
+        const shuffled = files.sort(() => 0.5 - Math.random()).slice(0, perCategoryCount);
+
+        for (const file of shuffled) {
+            const imgPath = `/dataset/train/${category}/${file}`;
+            guaranteedImages.push({ image: imgPath, category });
+            selectedImages.add(imgPath);
+        }
+    }
+
+    // Step 2: Collect all remaining images from all categories
+    let allRemaining = [];
+    const allCategories = fs.readdirSync(DATASET_PATH_TRAIN).filter(folder =>
         fs.statSync(path.join(DATASET_PATH_TRAIN, folder)).isDirectory()
     );
 
-    if (categories.length === 0) return res.json({ error: "No categories found" });
-
-    // Collect all image paths
-    let allImages = [];
-    categories.forEach(category => {
+    for (const category of allCategories) {
         const categoryPath = path.join(DATASET_PATH_TRAIN, category);
         const files = fs.readdirSync(categoryPath).filter(file => file.endsWith(".png"));
-        files.forEach(file => {
-            allImages.push({
-                image: `/dataset/train/${category}/${file}`,
-                category: category
-            });
-        });
-    });
+        for (const file of files) {
+            const imgPath = `/dataset/train/${category}/${file}`;
+            if (!selectedImages.has(imgPath)) {
+                allRemaining.push({ image: imgPath, category });
+            }
+        }
+    }
 
-    // Shuffle and pick first N unique images
-    const shuffleArray = arr => arr.sort(() => 0.5 - Math.random());
-    const uniqueImages = shuffleArray(allImages).slice(0, 100);
+    // Step 3: Randomly select the rest (excluding duplicates)
+    const randomExtra = allRemaining.sort(() => 0.5 - Math.random()).slice(0, half);
 
-    res.json({ images: uniqueImages });
+    // Final merge and return
+    const finalImages = [...guaranteedImages, ...randomExtra];
+    res.json({ images: finalImages });
 });
-
 
 // API Endpoint: Start training with user-sorted data
 app.post("/start-training", (req, res) => {
