@@ -51,7 +51,7 @@ app.get("/random-image", (req, res) => {
 app.get("/random-images", (req, res) => {
     const targetTotal = 32;
     const half = targetTotal / 2;
-    const categories = ["Copepods", "Foraminifera", "Cnidaria", "Detritus"];
+    const categories = ["Copepods", "Foraminifera", "Jellyfish", "Marine Snow"];
 
     const selectedImages = new Set();
     const guaranteedImages = [];

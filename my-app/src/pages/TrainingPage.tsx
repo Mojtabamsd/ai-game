@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./TrainingPage.css";
 
-const categories = ["Copepods", "Foraminifera", "Cnidaria", "Detritus"];
+const categories = ["Copepods", "Foraminifera", "Jellyfish", "Marine Snow"];
 
 const TrainingPage = () => {
     const [trainingImages, setTrainingImages] = useState<{ image: string, category: string }[]>([]);
@@ -12,7 +12,7 @@ const TrainingPage = () => {
     const [isTraining, setIsTraining] = useState(false);
     const [trainingResult, setTrainingResult] = useState<string | null>(null);
     const [username, setUsername] = useState<string | null>(null);
-    const [timer, setTimer] = useState(35);
+    const [timer, setTimer] = useState(60);
     const [timerActive, setTimerActive] = useState(true);
     const [topScores, setTopScores] = useState<{ username: string; accuracy: number }[]>([]);
     const navigate = useNavigate();
