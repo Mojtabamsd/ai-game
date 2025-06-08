@@ -1,18 +1,21 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./StartPage.css";
+
 
 const StartPage = () => {
     const [username, setUsername] = useState("");
     const [existingUsernames, setExistingUsernames] = useState<string[]>([]);
     const [error, setError] = useState("");
     const navigate = useNavigate();
+    const inputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         fetch("http://localhost:5000/top-scores")
             .then(res => res.json())
             .then(data => setExistingUsernames(data.map((entry: { username: string }) => entry.username)));
+        inputRef.current?.focus();
     }, []);
 
     const handleLogin = () => {
@@ -39,6 +42,7 @@ const StartPage = () => {
                 <h1 className="mb-3 text-white">🌊 AI Learning Platform</h1>
                 <p className="text-white">Enter your name to start the adventure!</p>
                 <input
+                    ref={inputRef}  // ← add this
                     type="text"
                     className="form-control mb-3"
                     placeholder="Enter your name"
