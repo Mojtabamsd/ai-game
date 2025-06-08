@@ -47,6 +47,9 @@ const StartPage = () => {
                         setUsername(e.target.value);
                         setError("");
                     }}
+                    onKeyDown={(e) => {
+                        if (e.key === "Enter") handleLogin();
+                    }}
                 />
                 <button className="btn btn-primary start-button w-100" onClick={handleLogin}>
                     Start Game
