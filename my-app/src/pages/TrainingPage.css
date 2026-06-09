@@ -5,7 +5,7 @@
     justify-content: center;
     position: relative;
     overflow: hidden;
-    padding: 24px;
+    padding: 22px;
 }
 
 .training-page::before {
@@ -21,25 +21,27 @@
     z-index: 1;
     width: 100%;
     max-width: 1200px;
-    padding: 48px 44px 40px;
+    padding: 46px 42px 38px;   /* reduced from 48/44/40 */
 }
 
-/* Header row */
+/* Header */
 .training-header {
-    margin-bottom: 28px;
+    margin-bottom: 28px;        /* reduced */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
 }
 
 .training-title {
     font-family: 'Syne', sans-serif;
-    font-size: 1.5rem;
+    font-size: 1.5rem;         /* slightly smaller */
     font-weight: 700;
     color: #ffffff;
     margin-bottom: 6px;
 }
-
-.training-title span {
-    color: #00e5cc;
-}
+.training-title span { color: #00e5cc; }
 
 .timer-badge {
     display: inline-flex;
@@ -55,14 +57,12 @@
     color: #ffe500;
     letter-spacing: 0.04em;
 }
-
 .timer-badge.urgent {
     border-color: rgba(255,107,91,0.4);
     background: rgba(255,107,91,0.1);
     color: #ff6b5b;
     animation: timer-pulse 0.8s ease-in-out infinite;
 }
-
 @keyframes timer-pulse {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.6; }
@@ -73,19 +73,16 @@
     border: 2px dashed rgba(0,229,204,0.25);
     background: rgba(0,229,204,0.04);
     border-radius: 16px;
-    padding: 20px 12px;
-    min-height: 130px;
+    padding: 20px 12px;          /* reduced */
+    min-height: 130px;           /* reduced */
     transition: all 0.2s ease;
     cursor: default;
 }
-
-.drop-zone:hover,
-.drop-zone.drag-over {
+.drop-zone:hover, .drop-zone.drag-over {
     border-color: rgba(0,229,204,0.6);
     background: rgba(0,229,204,0.1);
     box-shadow: 0 0 20px rgba(0,229,204,0.1);
 }
-
 .drop-zone-title {
     font-family: 'Syne', sans-serif;
     font-size: 0.8rem;
@@ -95,14 +92,13 @@
     color: #00e5cc;
     margin-bottom: 6px;
 }
-
 .drop-zone-count {
     font-size: 0.78rem;
     color: #5a7a8a;
     font-weight: 500;
 }
 
-/* Unclassified images grid */
+/* Image grid */
 .images-grid {
     display: flex;
     flex-wrap: wrap;
@@ -113,138 +109,112 @@
     border-radius: 16px;
     background: rgba(255,255,255,0.02);
     border: 1px solid rgba(255,255,255,0.04);
+    min-height: 60px;
 }
 
 .training-image {
-    width: 110px;
-    height: 110px;
+    width: 102px;                /* reduced from 110 */
+    height: 102px;
     object-fit: cover;
-    border-radius: 10px;
+    border-radius: 8px;
     cursor: grab;
     border: 2px solid rgba(255,255,255,0.08);
     transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
-
 .training-image:hover {
     transform: scale(1.08) translateY(-2px);
     border-color: rgba(0,229,204,0.5);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.4);
 }
+.training-image:active { cursor: grabbing; transform: scale(1.12); }
 
-.training-image:active {
-    cursor: grabbing;
-    transform: scale(1.12);
-}
-
-/* Action buttons row */
+/* Action buttons */
 .training-actions {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 12px;
-    margin-top: 28px;
+    gap: 10px;
+    margin-top: 16px;           /* reduced */
     flex-wrap: wrap;
 }
 
-/* Score / results screen */
+/* Results */
 .score-container {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 20px 0;
+    padding: 12px 0;
 }
-
 .score-label {
     font-family: 'Syne', sans-serif;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     font-weight: 600;
     letter-spacing: 0.16em;
     text-transform: uppercase;
     color: #00e5cc;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
 }
-
 .score-value {
     font-family: 'Syne', sans-serif;
-    font-size: 4rem;
+    font-size: 3.6rem;
     font-weight: 800;
     color: #ffffff;
     line-height: 1;
     margin-bottom: 4px;
 }
-
-.score-value span {
-    color: #00e5cc;
-}
-
+.score-value span { color: #00e5cc; }
 .score-subtitle {
-    font-size: 0.9rem;
+    font-size: 0.88rem;
     color: #5a7a8a;
-    margin-bottom: 32px;
+    margin-bottom: 24px;
 }
 
-/* Leaderboard */
 .leaderboard {
     width: 100%;
-    max-width: 440px;
+    max-width: 420px;
     background: rgba(255,255,255,0.04);
     border: 1px solid rgba(0,229,204,0.12);
-    border-radius: 16px;
+    border-radius: 14px;
     overflow: hidden;
-    margin-bottom: 32px;
+    margin-bottom: 24px;
 }
-
 .leaderboard-header {
     font-family: 'Syne', sans-serif;
-    font-size: 0.72rem;
+    font-size: 0.7rem;
     font-weight: 700;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: #00e5cc;
-    padding: 14px 20px;
+    padding: 12px 18px;
     border-bottom: 1px solid rgba(0,229,204,0.1);
 }
-
 .leaderboard-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 20px;
+    padding: 10px 18px;
     border-bottom: 1px solid rgba(255,255,255,0.04);
-    font-size: 0.9rem;
+    font-size: 0.875rem;
     color: #c8dce4;
     transition: background 0.15s;
 }
-
-.leaderboard-row:last-child {
-    border-bottom: none;
-}
-
-.leaderboard-row:hover {
-    background: rgba(0,229,204,0.04);
-}
-
+.leaderboard-row:last-child { border-bottom: none; }
+.leaderboard-row:hover { background: rgba(0,229,204,0.04); }
 .leaderboard-rank {
     font-family: 'Syne', sans-serif;
-    font-size: 0.72rem;
+    font-size: 0.7rem;
     font-weight: 700;
     color: #5a7a8a;
-    width: 24px;
+    width: 22px;
 }
-
 .leaderboard-score {
     font-family: 'Syne', sans-serif;
     font-weight: 700;
     color: #00e5cc;
 }
 
-/* Blurred state while processing */
-.blurred {
-    filter: blur(6px);
-    pointer-events: none;
-    user-select: none;
-}
-
+/* Processing */
+.blurred { filter: blur(6px); pointer-events: none; user-select: none; }
 .processing-overlay {
     position: absolute;
     inset: 0;
@@ -252,26 +222,21 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 16px;
+    gap: 14px;
     z-index: 10;
 }
-
 .processing-spinner {
-    width: 48px;
-    height: 48px;
+    width: 44px;
+    height: 44px;
     border: 3px solid rgba(0,229,204,0.15);
     border-top-color: #00e5cc;
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
 }
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
+@keyframes spin { to { transform: rotate(360deg); } }
 .processing-text {
     font-family: 'Syne', sans-serif;
-    font-size: 1rem;
+    font-size: 0.95rem;
     font-weight: 600;
     color: #00e5cc;
     letter-spacing: 0.06em;

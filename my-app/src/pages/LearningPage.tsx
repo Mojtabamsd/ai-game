@@ -1,14 +1,21 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import "bootstrap/dist/css/bootstrap.min.css";
+import { useNavigate } from "react-router-dom";
 import "./LearningPage.css";
 
 const categories = ["Copepods", "Foraminifera", "Jellyfish", "Marine Snow"];
+
 const categoryDescriptions: { [key: string]: string } = {
-    "Copepods": "Tiny crustaceans and the most numerous animals in the ocean! Copepods are the \"insects of the sea\" fast, abundant, and vital food for fish, whales, and seabirds.",
+    "Copepods": "Tiny crustaceans and the most numerous animals in the ocean! Copepods are the \"insects of the sea\" — fast, abundant, and vital food for fish, whales, and seabirds.",
     "Foraminifera": "Single-celled organisms with beautiful, shell-like structures. These \"living sand grains\" help scientists study past climates from the seafloor.",
-    "Jellyfish": "This group includes jellyfish and other gelatinous drifters. With stinging cells and graceful movements, they’re both mesmerizing and mysterious.",
+    "Jellyfish": "This group includes jellyfish and other gelatinous drifters. With stinging cells and graceful movements, they're both mesmerising and mysterious.",
     "Marine Snow": "Made of dead plankton, waste, and organic debris, Marine Snow drifts down the water column and feeds life in the deep sea."
+};
+
+const categoryIcons: { [key: string]: string } = {
+    "Copepods": "🦐",
+    "Foraminifera": "🐚",
+    "Jellyfish": "🪼",
+    "Marine Snow": "❄️"
 };
 
 const LearningPage = () => {
@@ -16,7 +23,7 @@ const LearningPage = () => {
     const [showQuiz, setShowQuiz] = useState(false);
     const [quizImage, setQuizImage] = useState<string | null>(null);
     const [quizAnswer, setQuizAnswer] = useState<string | null>(null);
-    const [feedback, setFeedback] = useState<string | null>(null);
+    const [feedback, setFeedback] = useState<"correct" | "wrong" | null>(null);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -27,7 +34,7 @@ const LearningPage = () => {
     }, [step]);
 
     const speakText = (text: string) => {
-        stopSpeaking(); // Stop any ongoing speech
+        stopSpeaking();
         if (text) {
             const speech = new SpeechSynthesisUtterance(text);
             speech.lang = "en-US";
@@ -35,14 +42,10 @@ const LearningPage = () => {
         }
     };
 
-    const stopSpeaking = () => {
-        window.speechSynthesis.cancel();
-    };
+    const stopSpeaking = () => window.speechSynthesis.cancel();
 
     useEffect(() => {
-        if (step >= categories.length) {
-            startQuiz();
-        }
+        if (step >= categories.length) startQuiz();
     }, [step]);
 
     const startQuiz = async () => {
@@ -55,10 +58,7 @@ const LearningPage = () => {
         try {
             const response = await fetch("http://localhost:5000/random-image");
             const data = await response.json();
-            if (data.error) {
-                console.error(data.error);
-                return;
-            }
+            if (data.error) return;
             setQuizImage(data.image);
             setQuizAnswer(data.category);
             setFeedback(null);
@@ -68,52 +68,113 @@ const LearningPage = () => {
     };
 
     const checkAnswer = (selected: string) => {
-        setFeedback(selected === quizAnswer ? "✅ Correct!" : "❌ Oops! Incorrect.");
+        const isCorrect = selected === quizAnswer;
+        setFeedback(isCorrect ? "correct" : "wrong");
         setTimeout(() => {
             loadNewQuizImage();
             setFeedback(null);
-        }, 2000);
+        }, 1800);
     };
 
-    const handleBackToMainMenu = () => {
+    const handleBack = () => {
         stopSpeaking();
         navigate("/main-menu");
     };
 
     return (
-        <div className="learning-page d-flex align-items-center justify-content-center vh-100" style={{
-            backgroundImage: "url('/images/learning-background.jpg')",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            backgroundAttachment: "fixed"
-        }}>
-            <div className="learning-container text-center p-4">
+        <div
+            className="learning-page"
+            style={{
+                backgroundImage: "url('/images/learning-background.jpg')",
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                backgroundAttachment: "fixed",
+            }}
+        >
+            <div className="glass-card learning-card">
+
                 {!showQuiz ? (
-                    step < categories.length ? (
-                        <>
-                            <h2 className="mb-4 text-white">{categories[step]}</h2>
-                            <p className="category-description">{categoryDescriptions[categories[step]]}</p>
-                            <img src={`/dataset/${categories[step]}/image1.png`} alt={categories[step]} className="img-fluid border rounded mb-4" style={{ width: "500px", height: "500px" }} />
-                            <button onClick={() => setStep(step + 1)} className="btn btn-success btn-lg">Next</button>
-                        </>
-                    ) : null
-                ) : (
+                    /* ── Learning step ── */
                     <>
-                        <h2 className="mb-4 text-white">Which category is this?</h2>
-                        {quizImage && <img src={quizImage} alt="Quiz Example" className="img-fluid border rounded mb-4" style={{ width: "500px", height: "500px" }} />}
-                        <div className="row justify-content-center">
-                            {categories.map((category) => (
-                                <div className="col-6 col-md-3 mb-2" key={category}>
-                                    <button onClick={() => checkAnswer(category)} className="btn btn-primary btn-lg w-100">
-                                        {category}
-                                    </button>
-                                </div>
+                        {/* Progress dots */}
+                        <div className="step-dots">
+                            {categories.map((_, i) => (
+                                <div
+                                    key={i}
+                                    className={`step-dot ${i === step ? "active" : i < step ? "done" : ""}`}
+                                />
                             ))}
                         </div>
-                        {feedback && <p className="mt-4 fw-bold text-white">{feedback}</p>}
+
+                        <p className="learning-eyebrow">
+                            Species {step + 1} of {categories.length}
+                        </p>
+                        <h2 className="learning-title">
+                            {categoryIcons[categories[step]]} {categories[step]}
+                        </h2>
+                        <p className="learning-description">
+                            {categoryDescriptions[categories[step]]}
+                        </p>
+
+                        <div className="learning-img-frame">
+                            <img
+                                src={`/dataset/${categories[step]}/image1.png`}
+                                alt={categories[step]}
+                                className="learning-img"
+                            />
+                        </div>
+
+                        <div className="learning-actions">
+                            <button className="btn-ocean" onClick={() => setStep(step + 1)}>
+                                {step < categories.length - 1 ? "Next Species →" : "Start Quiz →"}
+                            </button>
+                            <button className="btn-coral" onClick={handleBack}>
+                                ← Menu
+                            </button>
+                        </div>
+                    </>
+                ) : (
+                    /* ── Quiz ── */
+                    <>
+                        <p className="quiz-label">Quick-fire quiz</p>
+                        <h2 className="quiz-title">Which species is this?</h2>
+
+                        <div className="learning-img-frame" style={{ marginBottom: "20px" }}>
+                            {quizImage && (
+                                <img
+                                    src={quizImage}
+                                    alt="Quiz"
+                                    className="learning-img quiz-img"
+                                />
+                            )}
+                        </div>
+
+                        {feedback && (
+                            <div className={`feedback-badge ${feedback}`}>
+                                {feedback === "correct" ? "✓ Correct!" : "✗ Not quite — keep going!"}
+                            </div>
+                        )}
+
+                        <div className="quiz-grid">
+                            {categories.map((category) => (
+                                <button
+                                    key={category}
+                                    className="quiz-btn"
+                                    onClick={() => checkAnswer(category)}
+                                    disabled={!!feedback}
+                                >
+                                    {categoryIcons[category]} {category}
+                                </button>
+                            ))}
+                        </div>
+
+                        <div className="learning-actions">
+                            <button className="btn-coral" onClick={handleBack}>
+                                ← Back to Menu
+                            </button>
+                        </div>
                     </>
                 )}
-                <button onClick={handleBackToMainMenu} className="btn btn-danger btn-lg mt-4">Back to Main Menu</button>
             </div>
         </div>
     );
