@@ -1,0 +1,10 @@
+node_modules
+server/node_modules
+build
+.venv
+server/__pycache__
+server/game.db
+data
+*.log
+.git
+.env
