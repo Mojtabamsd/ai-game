@@ -2,18 +2,28 @@ const express = require("express");
 const fs = require("fs");
 const path = require("path");
 const cors = require("cors");
+const helmet = require("helmet");
 const { exec } = require("child_process");
 const Database = require("better-sqlite3");
 
 const app = express();
 app.use(cors());
+app.use(helmet());
 app.use(express.json());
+
+// Serve React frontend in production
+if (process.env.NODE_ENV === "production") {
+    app.use(express.static(path.join(__dirname, "../build")));
+}
 
 const DATASET_PATH = path.join(__dirname, "../public/dataset");
 const DATASET_PATH_TRAIN = path.join(__dirname, "../public/dataset/train");
 const DATASET_PATH_TEST = path.join(__dirname, "../public/dataset/test");
 const MODEL_PATH = path.join(__dirname, "../server/plankton_classifier.pkl");
-const DB_PATH = path.join(__dirname, "game.db");
+// Use /data volume for persistence in container, fall back to local for dev
+const DB_PATH = process.env.NODE_ENV === "production"
+    ? "/data/game.db"
+    : path.join(__dirname, "game.db");
 
 // ─── Database setup ───────────────────────────────────────────────────────────
 
@@ -24,32 +34,32 @@ db.pragma("journal_mode = WAL");
 
 db.exec(`
     CREATE TABLE IF NOT EXISTS scores (
-        id          INTEGER PRIMARY KEY AUTOINCREMENT,
-        username    TEXT    NOT NULL UNIQUE,
-        accuracy    REAL    NOT NULL,
-        timestamp   TEXT    NOT NULL
+                                          id          INTEGER PRIMARY KEY AUTOINCREMENT,
+                                          username    TEXT    NOT NULL UNIQUE,
+                                          accuracy    REAL    NOT NULL,
+                                          timestamp   TEXT    NOT NULL
     );
 
     CREATE TABLE IF NOT EXISTS sessions (
-        id          INTEGER PRIMARY KEY AUTOINCREMENT,
-        session_id  TEXT    NOT NULL UNIQUE,
-        username    TEXT    NOT NULL,
-        accuracy    REAL    NOT NULL,
-        total_images INTEGER NOT NULL,
-        time_taken  INTEGER NOT NULL,
-        timestamp   TEXT    NOT NULL
+                                            id          INTEGER PRIMARY KEY AUTOINCREMENT,
+                                            session_id  TEXT    NOT NULL UNIQUE,
+                                            username    TEXT    NOT NULL,
+                                            accuracy    REAL    NOT NULL,
+                                            total_images INTEGER NOT NULL,
+                                            time_taken  INTEGER NOT NULL,
+                                            timestamp   TEXT    NOT NULL
     );
 
     CREATE TABLE IF NOT EXISTS selections (
-        id              INTEGER PRIMARY KEY AUTOINCREMENT,
-        session_id      TEXT    NOT NULL,
-        username        TEXT    NOT NULL,
-        image_path      TEXT    NOT NULL,
-        true_category   TEXT    NOT NULL,
-        user_category   TEXT    NOT NULL,
-        correct         INTEGER NOT NULL,   -- 1 = correct, 0 = wrong
-        FOREIGN KEY (session_id) REFERENCES sessions(session_id)
-    );
+                                              id              INTEGER PRIMARY KEY AUTOINCREMENT,
+                                              session_id      TEXT    NOT NULL,
+                                              username        TEXT    NOT NULL,
+                                              image_path      TEXT    NOT NULL,
+                                              true_category   TEXT    NOT NULL,
+                                              user_category   TEXT    NOT NULL,
+                                              correct         INTEGER NOT NULL,   -- 1 = correct, 0 = wrong
+                                              FOREIGN KEY (session_id) REFERENCES sessions(session_id)
+        );
 
     CREATE INDEX IF NOT EXISTS idx_sessions_username  ON sessions(username);
     CREATE INDEX IF NOT EXISTS idx_selections_session ON selections(session_id);
@@ -61,9 +71,9 @@ const stmts = {
     upsertScore: db.prepare(`
         INSERT INTO scores (username, accuracy, timestamp)
         VALUES (@username, @accuracy, @timestamp)
-        ON CONFLICT(username) DO UPDATE SET
+            ON CONFLICT(username) DO UPDATE SET
             accuracy  = CASE WHEN excluded.accuracy > scores.accuracy THEN excluded.accuracy ELSE scores.accuracy END,
-            timestamp = CASE WHEN excluded.accuracy > scores.accuracy THEN excluded.timestamp ELSE scores.timestamp END
+                                         timestamp = CASE WHEN excluded.accuracy > scores.accuracy THEN excluded.timestamp ELSE scores.timestamp END
     `),
     topScores: db.prepare(`
         SELECT username, accuracy FROM scores ORDER BY accuracy DESC LIMIT 6
@@ -165,8 +175,14 @@ app.post("/start-training", (req, res) => {
     }
     const trainingDataPath = path.join(__dirname, "../server/training_data.json");
     fs.writeFileSync(trainingDataPath, JSON.stringify(sortedImages, null, 2));
-    const pythonPath = path.join(__dirname, "../../.venv/Scripts/python");
-    exec(`"${pythonPath}" server/train_model.py "${trainingDataPath}" "${MODEL_PATH}" "${DATASET_PATH_TEST}"`, (error, stdout, stderr) => {
+
+    // Use Linux venv path in Docker (production), Windows path locally
+    const pythonPath = process.env.NODE_ENV === "production"
+        ? "/app/.venv/bin/python3"
+        : path.join(__dirname, "../../.venv/Scripts/python");
+
+    const trainScriptPath = path.join(__dirname, "train_model.py");
+    exec(`"${pythonPath}" "${trainScriptPath}" "${trainingDataPath}" "${MODEL_PATH}" "${DATASET_PATH_TEST}"`, (error, stdout, stderr) => {
         if (error) {
             console.error(`Error training model: ${stderr}`);
             return res.status(500).json({ error: "Training failed" });
@@ -241,6 +257,13 @@ app.get("/session/:sessionId", (req, res) => {
     const selections = stmts.selectionsBySession.all(req.params.sessionId);
     res.json(selections);
 });
+
+// Catch-all: serve React app for any non-API route (React Router support)
+if (process.env.NODE_ENV === "production") {
+    app.get("*", (req, res) => {
+        res.sendFile(path.join(__dirname, "../build", "index.html"));
+    });
+}
 
 // ─── Start ────────────────────────────────────────────────────────────────────
 
