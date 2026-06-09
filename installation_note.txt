@@ -23,3 +23,7 @@ create a file called: tailwind.config.js
 5. for running app: npm start
 for running server: first go  cd .\my-app\       then node server/server.js
 
+
+6. for docker, build --> docker compose up --build
+stop --> docker compose down
+run  --> docker compose up
