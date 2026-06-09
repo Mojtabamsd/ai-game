@@ -93,11 +93,11 @@ const StartPage = () => {
             }}
         >
             <div className="glass-card start-card">
-                <p className="start-eyebrow">Citizen Science Project</p>
+                {/*<p className="start-eyebrow">Citizen Science Project</p>*/}
                 <h1 className="start-title">AI Learning<br /><span>Platform</span></h1>
                 <p className="start-subtitle">
                     Help train an AI to identify plankton species.<br />
-                    Drag and sort images — every choice you make matters.
+                    Drag and sort images.
                 </p>
 
                 {/* Name area */}
@@ -139,7 +139,7 @@ const StartPage = () => {
 
                 <div className="start-btn-wrapper">
                     <button className="btn-ocean" onClick={handleLogin} disabled={!username || editing}>
-                        {username ? "Start Game 🌊" : "Loading…"}
+                        {username ? "Start Game" : "Loading…"}
                     </button>
                 </div>
 

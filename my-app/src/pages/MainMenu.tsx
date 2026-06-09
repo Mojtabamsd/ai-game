@@ -31,7 +31,7 @@ const MainMenu = () => {
             }}
         >
             <div className="glass-card menu-card">
-                <p className="menu-greeting">Welcome back</p>
+                {/*<p className="menu-greeting">Welcome</p>*/}
                 <h1 className="menu-title">
                     Hello, <span>{username}</span>
                 </h1>
