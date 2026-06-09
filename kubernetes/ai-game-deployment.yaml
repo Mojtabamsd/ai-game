@@ -1,0 +1,82 @@
+#this defines a deployment of an app
+#it will create 1 (more if you change the number of replicas) pod
+#it will run the image specified in the containers image section
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-game-deployment
+  namespace: ai-game
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ai-game-deployment
+  template:
+    metadata:
+      labels:
+        app: ai-game-deployment
+    spec:
+      containers:
+      - name: ai-game
+        image: docker.io/mojmas/plankton-ai:v1.0
+        ports:
+        - containerPort: 5000
+        #command: [ "/usr/local/bin/node"]
+        #args: [ "run", "node" ]
+---
+#this defines a service, which encapsulates a deployment
+apiVersion: v1
+kind: Service
+metadata:
+  name: ai-game-service
+  namespace: ai-game
+spec:
+  type: ClusterIP
+  ports:
+  - port: 5000
+  selector:
+    app: ai-game-deployment
+---
+#this defines an ingress which links a path on the ingress controller to a service
+#this lets us connect to our app from the internet
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ai-game-ingress
+  namespace: ai-game
+  annotations:
+    #note we must have a cluster issuer of this name already running, use kubectl get clusterissuers to see a list of them
+    cert-manager.io/cluster-issuer: letsencrypt-imfe
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    #this stops error 413 Request Entity Too Large errors
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    #nginx.ingress.kubernetes.io/rewrite-target: /$2
+
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      more_set_headers "X-Content-Type-Options: nosniff";
+      #'unsafe-inline'
+      #more_set_headers "Content-Security-Policy: default-src 'self'; script-src 'self' https://plankton-ai.noc.ac.uk; style-src 'self' 'unsafe-inline' https://plankton-ai.noc.ac.uk; img-src 'self' data: https://plankton-ai.noc.ac.uk; font-src 'self' data: https://plankton-ai.noc.ac.uk; frame-src 'self' https://plankton-ai.noc.ac.uk; connect-src 'self' https://plankton-ai.noc.ac.uk; media-src 'self'; object-src 'none'; base-uri 'self'"
+      more_set_headers "Strict-Transport-Security: max-age=31536000; includeSubDomains";
+      more_set_headers "Referrer-Policy: no-referrer-when-downgrade";
+      more_set_headers "X-Frame-Options: DENY";
+      more_set_headers "Permissions-Policy: fullscreen=(self)";
+
+
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - plankton-ai.noc.ac.uk
+    secretName: ai-game-tls
+  rules:
+  - host: plankton-ai.noc.ac.uk
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: ai-game-service
+            port:
+              number: 5000
