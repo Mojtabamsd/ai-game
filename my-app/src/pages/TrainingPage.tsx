@@ -16,6 +16,7 @@ const TrainingPage = () => {
     const [timerActive, setTimerActive] = useState(true);
     const [topScores, setTopScores] = useState<{ username: string; accuracy: number }[]>([]);
     const [sessionSaved, setSessionSaved] = useState(false);
+    const [history, setHistory] = useState<{ image: { image: string, category: string }, category: string }[]>([]);
     const startTimeRef = useRef<number>(Date.now());
     const navigate = useNavigate();
 
@@ -32,6 +33,16 @@ const TrainingPage = () => {
         fetchTrainingImages();
         startTimeRef.current = Date.now();
     }, []);
+
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if ((e.key === "z" || e.key === "Z") && !trainingResult) {
+                handleUndo();
+            }
+        };
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [history, trainingResult]);
 
     useEffect(() => {
         if (timer > 0 && timerActive) {
@@ -72,6 +83,11 @@ const TrainingPage = () => {
 
     const handleDrop = (category: string) => {
         if (draggedImage) {
+            // Find the original image object so we can restore it on undo
+            const originalImage = trainingImages.find(img => img.image === draggedImage);
+            if (originalImage) {
+                setHistory(prev => [...prev, { image: originalImage, category }]);
+            }
             setSortedImages((prev) => ({
                 ...prev,
                 [category]: [...(prev[category] || []), draggedImage],
@@ -79,6 +95,24 @@ const TrainingPage = () => {
             setTrainingImages(trainingImages.filter(img => img.image !== draggedImage));
             setDraggedImage(null);
         }
+    };
+
+    const handleUndo = () => {
+        if (history.length === 0) return;
+        const last = history[history.length - 1];
+
+        // Remove image from the category bucket it was dropped into
+        setSortedImages(prev => {
+            const updated = { ...prev };
+            updated[last.category] = (updated[last.category] || []).filter(
+                img => img !== last.image.image
+            );
+            return updated;
+        });
+
+        // Put the image back in the unclassified pool
+        setTrainingImages(prev => [...prev, last.image]);
+        setHistory(prev => prev.slice(0, -1));
     };
 
     const saveSession = async (accuracy: number, finalSortedImages: { [key: string]: string[] }) => {
@@ -205,11 +239,21 @@ const TrainingPage = () => {
                     </div>
                 )}
                 {!isTraining && !trainingResult && (
-                    <button className="btn btn-success btn-lg mt-4" onClick={startTraining} disabled={isTraining}>
-                        Start Training
-                    </button>
+                    <div className="d-flex justify-content-center gap-3 mt-4">
+                        <button
+                            className="btn btn-warning btn-lg"
+                            onClick={handleUndo}
+                            disabled={history.length === 0}
+                            title="Undo last drop (Z)"
+                        >
+                            ↩ Undo (Z)
+                        </button>
+                        <button className="btn btn-success btn-lg" onClick={startTraining} disabled={isTraining}>
+                            Start Training
+                        </button>
+                        <Link to="/main-menu" className="btn btn-danger btn-lg">Back to Main Menu</Link>
+                    </div>
                 )}
-                {!isTraining && !trainingResult && <Link to="/main-menu" className="btn btn-danger btn-lg mt-4">Back to Main Menu</Link>}
             </div>
         </div>
     );
