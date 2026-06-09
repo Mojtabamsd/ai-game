@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./TrainingPage.css";
@@ -15,6 +15,8 @@ const TrainingPage = () => {
     const [timer, setTimer] = useState(60);
     const [timerActive, setTimerActive] = useState(true);
     const [topScores, setTopScores] = useState<{ username: string; accuracy: number }[]>([]);
+    const [sessionSaved, setSessionSaved] = useState(false);
+    const startTimeRef = useRef<number>(Date.now());
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -28,6 +30,7 @@ const TrainingPage = () => {
 
     useEffect(() => {
         fetchTrainingImages();
+        startTimeRef.current = Date.now();
     }, []);
 
     useEffect(() => {
@@ -78,21 +81,54 @@ const TrainingPage = () => {
         }
     };
 
+    const saveSession = async (accuracy: number, finalSortedImages: { [key: string]: string[] }) => {
+        if (!username || sessionSaved) return;
+
+        const timeTaken = Math.round((Date.now() - startTimeRef.current) / 1000);
+        const totalImages = Object.values(finalSortedImages).reduce((sum, imgs) => sum + imgs.length, 0);
+
+        try {
+            await fetch("http://localhost:5000/save-session", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    username,
+                    accuracy,
+                    sortedImages: finalSortedImages,
+                    totalImages,
+                    timeTaken
+                })
+            });
+            setSessionSaved(true);
+            console.log("Session saved successfully");
+        } catch (error) {
+            console.error("Error saving session:", error);
+        }
+    };
+
     const startTraining = async () => {
         if (!isTraining) {
             setIsTraining(true);
             setTimerActive(false);
             setTrainingResult("Training...");
+
+            // Capture sortedImages at submission time
+            const finalSortedImages = { ...sortedImages };
+
             try {
                 const response = await fetch("http://localhost:5000/start-training", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ sortedImages })
+                    body: JSON.stringify({ sortedImages: finalSortedImages })
                 });
                 const data = await response.json();
                 const accuracy = parseFloat(data.accuracy);
                 setTrainingResult(`Accuracy: ${accuracy}%`);
 
+                // Save full session (every play, regardless of score)
+                await saveSession(accuracy, finalSortedImages);
+
+                // Save to leaderboard (only best score per user)
                 await fetch("http://localhost:5000/save-score", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },

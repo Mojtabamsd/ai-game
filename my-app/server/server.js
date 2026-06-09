@@ -4,6 +4,7 @@ const path = require("path");
 const cors = require("cors");
 const { exec } = require("child_process");
 const SCORES_PATH = path.join(__dirname, "training_scores.json");
+const SESSIONS_PATH = path.join(__dirname, "session_log.json");
 
 const app = express();
 app.use(cors());
@@ -119,6 +120,7 @@ app.post("/start-training", (req, res) => {
     });
 });
 
+// API Endpoint: Save best score per user (leaderboard)
 app.post("/save-score", (req, res) => {
     const { username, accuracy, overwrite } = req.body;
     if (!username || accuracy === undefined) {
@@ -146,6 +148,78 @@ app.post("/save-score", (req, res) => {
 
     fs.writeFileSync(SCORES_PATH, JSON.stringify(scores, null, 2));
     res.json({ success: true });
+});
+
+// API Endpoint: Save full session data for every play (for analysis)
+app.post("/save-session", (req, res) => {
+    const { username, accuracy, sortedImages, totalImages, timeTaken } = req.body;
+    if (!username || accuracy === undefined || !sortedImages) {
+        return res.status(400).json({ error: "Missing session data" });
+    }
+
+    let sessions = [];
+    if (fs.existsSync(SESSIONS_PATH)) {
+        try {
+            sessions = JSON.parse(fs.readFileSync(SESSIONS_PATH));
+        } catch (e) {
+            sessions = [];
+        }
+    }
+
+    // Build a flat list of each image and where the user placed it
+    const selections = [];
+    for (const [userCategory, images] of Object.entries(sortedImages)) {
+        for (const imagePath of images) {
+            // Extract the true category from the image path: /dataset/train/<TrueCategory>/<file>
+            const parts = imagePath.split("/");
+            const trueCategory = parts.length >= 4 ? parts[parts.length - 2] : "Unknown";
+            selections.push({
+                image: imagePath,
+                trueCategory,
+                userCategory,
+                correct: trueCategory === userCategory
+            });
+        }
+    }
+
+    const session = {
+        sessionId: `${username}_${Date.now()}`,
+        username,
+        accuracy,
+        totalImages,
+        timeTaken,          // seconds spent before submitting
+        timestamp: new Date().toISOString(),
+        selections          // full per-image breakdown
+    };
+
+    sessions.push(session);
+
+    fs.writeFileSync(SESSIONS_PATH, JSON.stringify(sessions, null, 2));
+    console.log(`Session saved for ${username}: ${accuracy}% accuracy, ${selections.length} images`);
+    res.json({ success: true, sessionId: session.sessionId });
+});
+
+// API Endpoint: Get all sessions (for analysis)
+app.get("/sessions", (req, res) => {
+    if (!fs.existsSync(SESSIONS_PATH)) return res.json([]);
+    try {
+        const sessions = JSON.parse(fs.readFileSync(SESSIONS_PATH));
+        res.json(sessions);
+    } catch (e) {
+        res.json([]);
+    }
+});
+
+// API Endpoint: Get sessions for a specific user
+app.get("/sessions/:username", (req, res) => {
+    if (!fs.existsSync(SESSIONS_PATH)) return res.json([]);
+    try {
+        const sessions = JSON.parse(fs.readFileSync(SESSIONS_PATH));
+        const userSessions = sessions.filter(s => s.username === req.params.username);
+        res.json(userSessions);
+    } catch (e) {
+        res.json([]);
+    }
 });
 
 app.get("/top-scores", (req, res) => {
