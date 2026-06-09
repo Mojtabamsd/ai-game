@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import "bootstrap/dist/css/bootstrap.min.css";
 import "./TrainingPage.css";
 
 const categories = ["Copepods", "Foraminifera", "Jellyfish", "Marine Snow"];
@@ -77,18 +76,15 @@ const TrainingPage = () => {
         }
     };
 
-    const handleDragStart = (image: string) => {
-        setDraggedImage(image);
-    };
+    const handleDragStart = (image: string) => setDraggedImage(image);
 
     const handleDrop = (category: string) => {
         if (draggedImage) {
-            // Find the original image object so we can restore it on undo
             const originalImage = trainingImages.find(img => img.image === draggedImage);
             if (originalImage) {
                 setHistory(prev => [...prev, { image: originalImage, category }]);
             }
-            setSortedImages((prev) => ({
+            setSortedImages(prev => ({
                 ...prev,
                 [category]: [...(prev[category] || []), draggedImage],
             }));
@@ -100,8 +96,6 @@ const TrainingPage = () => {
     const handleUndo = () => {
         if (history.length === 0) return;
         const last = history[history.length - 1];
-
-        // Remove image from the category bucket it was dropped into
         setSortedImages(prev => {
             const updated = { ...prev };
             updated[last.category] = (updated[last.category] || []).filter(
@@ -109,32 +103,21 @@ const TrainingPage = () => {
             );
             return updated;
         });
-
-        // Put the image back in the unclassified pool
         setTrainingImages(prev => [...prev, last.image]);
         setHistory(prev => prev.slice(0, -1));
     };
 
     const saveSession = async (accuracy: number, finalSortedImages: { [key: string]: string[] }) => {
         if (!username || sessionSaved) return;
-
         const timeTaken = Math.round((Date.now() - startTimeRef.current) / 1000);
         const totalImages = Object.values(finalSortedImages).reduce((sum, imgs) => sum + imgs.length, 0);
-
         try {
             await fetch("http://localhost:5000/save-session", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    username,
-                    accuracy,
-                    sortedImages: finalSortedImages,
-                    totalImages,
-                    timeTaken
-                })
+                body: JSON.stringify({ username, accuracy, sortedImages: finalSortedImages, totalImages, timeTaken })
             });
             setSessionSaved(true);
-            console.log("Session saved successfully");
         } catch (error) {
             console.error("Error saving session:", error);
         }
@@ -145,10 +128,7 @@ const TrainingPage = () => {
             setIsTraining(true);
             setTimerActive(false);
             setTrainingResult("Training...");
-
-            // Capture sortedImages at submission time
             const finalSortedImages = { ...sortedImages };
-
             try {
                 const response = await fetch("http://localhost:5000/start-training", {
                     method: "POST",
@@ -157,12 +137,8 @@ const TrainingPage = () => {
                 });
                 const data = await response.json();
                 const accuracy = parseFloat(data.accuracy);
-                setTrainingResult(`Accuracy: ${accuracy}%`);
-
-                // Save full session (every play, regardless of score)
+                setTrainingResult(`${accuracy}`);
                 await saveSession(accuracy, finalSortedImages);
-
-                // Save to leaderboard (only best score per user)
                 await fetch("http://localhost:5000/save-score", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -170,88 +146,150 @@ const TrainingPage = () => {
                 });
             } catch (error) {
                 console.error("Error starting training:", error);
-                setTrainingResult("Training failed. Please try again.");
+                setTrainingResult("error");
             }
             setIsTraining(false);
         }
     };
 
+    const accuracyNum = trainingResult && trainingResult !== "error" && trainingResult !== "Training..."
+        ? parseFloat(trainingResult) : null;
+
     return (
-        <div className="training-page d-flex align-items-center justify-content-center vh-100" style={{
-            backgroundImage: "url('/images/training-background.jpg')",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            backgroundAttachment: "fixed"
-        }}>
-            <div className={`training-container text-center p-5 ${isTraining ? "blurred" : ""}`}>
-                {!isTraining && !trainingResult ? (
+        <div
+            className="training-page"
+            style={{
+                backgroundImage: "url('/images/training-background.jpg')",
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                backgroundAttachment: "fixed"
+            }}
+        >
+            {/* Processing overlay */}
+            {isTraining && (
+                <div className="processing-overlay">
+                    <div className="processing-spinner" />
+                    <p className="processing-text">Training AI model…</p>
+                </div>
+            )}
+
+            <div className={`glass-card training-container ${isTraining ? "blurred" : ""}`}>
+
+                {/* ── Game screen ── */}
+                {!trainingResult ? (
                     <>
-                        <h2 className="mb-4 text-white">{username}, drag and drop images to each category</h2>
-                        <h3 className="text-warning">Time Left: {timer}s</h3>
-                        <div className="row mb-4">
+                        <div className="training-header">
+                            <h2 className="training-title">
+                                <span>{username}</span>, sort the plankton images
+                            </h2>
+                            <span className={`timer-badge ${timer <= 10 ? "urgent" : ""}`}>
+                                ⏱ {timer}s remaining
+                            </span>
+                        </div>
+
+                        {/* Drop zones */}
+                        <div className="row g-3 mb-2">
                             {categories.map((category) => (
-                                <div
-                                    key={category}
-                                    className="col-md-3 border border-warning rounded p-4 text-center bg-dark text-white"
-                                    onDragOver={(e) => e.preventDefault()}
-                                    onDrop={() => handleDrop(category)}
-                                >
-                                    <h5>{category}</h5>
-                                    <p>{sortedImages[category]?.length || 0} images</p>
+                                <div key={category} className="col-md-3 col-6">
+                                    <div
+                                        className="drop-zone"
+                                        onDragOver={(e) => e.preventDefault()}
+                                        onDrop={() => handleDrop(category)}
+                                    >
+                                        <div className="drop-zone-title">{category}</div>
+                                        <div className="drop-zone-count">
+                                            {sortedImages[category]?.length || 0} image{sortedImages[category]?.length !== 1 ? "s" : ""}
+                                        </div>
+                                    </div>
                                 </div>
                             ))}
                         </div>
 
-                        <div className="d-flex flex-wrap justify-content-center gap-3">
-                            {trainingImages.map((img, index) => (
-                                <img
-                                    key={index}
-                                    src={img.image}
-                                    alt="Training"
-                                    draggable
-                                    onDragStart={() => handleDragStart(img.image)}
-                                    className="img-thumbnail shadow-lg rounded"
-                                    style={{ width: "120px", height: "120px", cursor: "grab" }}
-                                />
-                            ))}
+                        {/* Images to sort */}
+                        <div className="images-grid">
+                            {trainingImages.length === 0 ? (
+                                <p style={{ color: "#5a7a8a", fontSize: "0.9rem", margin: "20px 0" }}>
+                                    All images sorted — press Start Training when ready.
+                                </p>
+                            ) : (
+                                trainingImages.map((img, index) => (
+                                    <img
+                                        key={index}
+                                        src={img.image}
+                                        alt="Plankton"
+                                        draggable
+                                        onDragStart={() => handleDragStart(img.image)}
+                                        className="training-image"
+                                    />
+                                ))
+                            )}
+                        </div>
+
+                        {/* Action buttons */}
+                        <div className="training-actions">
+                            <button
+                                className="btn-ghost"
+                                onClick={handleUndo}
+                                disabled={history.length === 0}
+                                title="Undo last drop"
+                            >
+                                ↩ Undo (Z)
+                            </button>
+                            <button
+                                className="btn-ocean"
+                                onClick={startTraining}
+                                disabled={isTraining}
+                            >
+                                Submit & Train
+                            </button>
+                            <Link to="/main-menu" className="btn-coral" style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", padding: "14px 28px", borderRadius: "14px" }}>
+                                ← Back
+                            </Link>
                         </div>
                     </>
                 ) : (
-                    <div className="score-container text-white d-flex flex-column align-items-center justify-content-center">
-                        <h1 className="display-3 fw-bold score-text">{trainingResult}</h1>
+
+                    /* ── Results screen ── */
+                    <div className="score-container">
+                        <p className="score-label">Your accuracy</p>
+
+                        {accuracyNum !== null ? (
+                            <>
+                                <div className="score-value"><span>{accuracyNum}</span>%</div>
+                                <p className="score-subtitle">
+                                    {accuracyNum >= 80 ? "Excellent classification! 🎉" :
+                                        accuracyNum >= 60 ? "Good effort — keep practising!" :
+                                            "Nice try — the AI is learning from you!"}
+                                </p>
+                            </>
+                        ) : (
+                            <>
+                                <div className="score-value" style={{ color: "#ff6b5b" }}>—</div>
+                                <p className="score-subtitle">Training failed. Please try again.</p>
+                            </>
+                        )}
 
                         {topScores.length > 0 && (
-                            <div className="leaderboard bg-white text-dark p-4 rounded mt-4 w-75">
-                                <h4 className="mb-3">Top Scores</h4>
-                                <ul className="list-group">
-                                    {topScores.map((entry, idx) => (
-                                        <li key={idx} className="list-group-item d-flex justify-content-between">
-                                            <span>{entry.username}</span>
-                                            <span>{entry.accuracy}%</span>
-                                        </li>
-                                    ))}
-                                </ul>
+                            <div className="leaderboard">
+                                <div className="leaderboard-header">Leaderboard</div>
+                                {topScores.map((entry, idx) => (
+                                    <div key={idx} className="leaderboard-row">
+                                        <span className="leaderboard-rank">#{idx + 1}</span>
+                                        <span>{entry.username}</span>
+                                        <span className="leaderboard-score">{entry.accuracy}%</span>
+                                    </div>
+                                ))}
                             </div>
                         )}
 
-                        <button className="btn btn-primary btn-lg mt-4" onClick={() => window.location.reload()}>Train Again</button>
-                        <Link to="/" className="btn btn-danger btn-lg mt-2">Exit to Start Page</Link>
-                    </div>
-                )}
-                {!isTraining && !trainingResult && (
-                    <div className="d-flex justify-content-center gap-3 mt-4">
-                        <button
-                            className="btn btn-warning btn-lg"
-                            onClick={handleUndo}
-                            disabled={history.length === 0}
-                            title="Undo last drop (Z)"
-                        >
-                            ↩ Undo (Z)
-                        </button>
-                        <button className="btn btn-success btn-lg" onClick={startTraining} disabled={isTraining}>
-                            Start Training
-                        </button>
-                        <Link to="/main-menu" className="btn btn-danger btn-lg">Back to Main Menu</Link>
+                        <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", justifyContent: "center" }}>
+                            <button className="btn-ocean" onClick={() => window.location.reload()}>
+                                Play Again
+                            </button>
+                            <Link to="/" className="btn-coral" style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", padding: "14px 28px", borderRadius: "14px" }}>
+                                Exit
+                            </Link>
+                        </div>
                     </div>
                 )}
             </div>

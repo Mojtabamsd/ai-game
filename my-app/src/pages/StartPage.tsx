@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import "bootstrap/dist/css/bootstrap.min.css";
 import "./StartPage.css";
 
 const adjectives = [
@@ -34,39 +33,27 @@ const StartPage = () => {
             .then(data => {
                 const names = data.map((entry: { username: string }) => entry.username);
                 setExistingUsernames(names);
-
-                // Generate a unique random name
                 let name = generateRandomName();
-                while (names.includes(name)) {
-                    name = generateRandomName();
-                }
+                while (names.includes(name)) name = generateRandomName();
                 setUsername(name);
             })
-            .catch(() => {
-                // If server is unreachable, still generate a name
-                setUsername(generateRandomName());
-            });
+            .catch(() => setUsername(generateRandomName()));
     }, []);
 
     const handleLogin = () => {
         let name = username;
-
-        // Extra safety: if somehow name is taken, regenerate
         if (existingUsernames.includes(name)) {
             name = generateRandomName();
-            while (existingUsernames.includes(name)) {
-                name = generateRandomName();
-            }
+            while (existingUsernames.includes(name)) name = generateRandomName();
             setUsername(name);
         }
-
         localStorage.setItem("username", name);
         navigate("/main-menu");
     };
 
     return (
         <div
-            className="start-page d-flex align-items-center justify-content-center vh-100"
+            className="start-page"
             style={{
                 backgroundImage: "url('/images/start-background.jpg')",
                 backgroundSize: "cover",
@@ -74,21 +61,42 @@ const StartPage = () => {
                 backgroundAttachment: "fixed",
             }}
         >
-            <div className="login-container text-center p-4">
-                <h1 className="mb-3 text-white">🌊 AI Learning Platform</h1>
-                <p className="text-white mb-1">Ready to start the adventure?</p>
-                {username && (
-                    <p className="text-white mb-4">
-                        You'll play as: <strong>{username}</strong>
-                    </p>
+            <div className="glass-card start-card">
+                <p className="start-eyebrow">Citizen Science Project</p>
+                <h1 className="start-title">
+                    AI Learning<br /><span>Platform</span>
+                </h1>
+                <p className="start-subtitle">
+                    Help train an AI to identify plankton species.<br />
+                    Drag and sort images — every choice you make matters.
+                </p>
+
+                {username ? (
+                    <div className="player-badge">
+                        <span className="player-badge-label">Your name</span>
+                        <span className="player-badge-name">{username}</span>
+                    </div>
+                ) : (
+                    <div className="player-badge" style={{ opacity: 0.5 }}>
+                        <span className="player-badge-label">Generating name…</span>
+                    </div>
                 )}
-                <button
-                    className="btn btn-primary start-button w-100"
-                    onClick={handleLogin}
-                    disabled={!username}
-                >
-                    {username ? "Start Game" : "Loading..."}
-                </button>
+
+                <div className="start-btn-wrapper">
+                    <button
+                        className="btn-ocean"
+                        onClick={handleLogin}
+                        disabled={!username}
+                    >
+                        {username ? "Start Game 🌊" : "Loading…"}
+                    </button>
+                </div>
+
+                <p className="privacy-notice">
+                    <strong>Data notice:</strong> Your sorting selections and accuracy score
+                    are recorded anonymously for scientific research. No personal information
+                    is collected. By playing, you agree to contribute your results.
+                </p>
             </div>
         </div>
     );
