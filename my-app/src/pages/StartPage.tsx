@@ -31,7 +31,7 @@ const StartPage = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        fetch("http://localhost:5000/top-scores")
+        fetch("/top-scores")
             .then(res => res.json())
             .then(data => {
                 const names = data.map((e: { username: string }) => e.username);
@@ -93,11 +93,11 @@ const StartPage = () => {
             }}
         >
             <div className="glass-card start-card">
-                {/*<p className="start-eyebrow">Citizen Science Project</p>*/}
+                <p className="start-eyebrow">Citizen Science Project</p>
                 <h1 className="start-title">AI Learning<br /><span>Platform</span></h1>
                 <p className="start-subtitle">
                     Help train an AI to identify plankton species.<br />
-                    Drag and sort images.
+                    Drag and sort images — every choice you make matters.
                 </p>
 
                 {/* Name area */}
@@ -139,7 +139,7 @@ const StartPage = () => {
 
                 <div className="start-btn-wrapper">
                     <button className="btn-ocean" onClick={handleLogin} disabled={!username || editing}>
-                        {username ? "Start Game" : "Loading…"}
+                        {username ? "Start Game 🌊" : "Loading…"}
                     </button>
                 </div>
 

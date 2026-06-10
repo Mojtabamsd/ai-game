@@ -110,7 +110,7 @@ const TrainingPage = () => {
 
     useEffect(() => {
         if (trainingResult) {
-            fetch("http://localhost:5000/top-scores")
+            fetch("/top-scores")
                 .then(res => res.json())
                 .then(data => setTopScores(data));
         }
@@ -118,7 +118,7 @@ const TrainingPage = () => {
 
     const fetchTrainingImages = async () => {
         try {
-            const response = await fetch("http://localhost:5000/random-images");
+            const response = await fetch("/random-images");
             const data = await response.json();
             if (data.images) {
                 const updatedImages = data.images.map((img: { image: string, category: string }) => ({
@@ -159,7 +159,7 @@ const TrainingPage = () => {
         const timeTaken = Math.round((Date.now() - startTimeRef.current) / 1000);
         const totalImages = Object.values(finalSortedImages).reduce((sum, imgs) => sum + imgs.length, 0);
         try {
-            await fetch("http://localhost:5000/save-session", {
+            await fetch("/save-session", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ username, accuracy, sortedImages: finalSortedImages, totalImages, timeTaken })
@@ -177,12 +177,12 @@ const TrainingPage = () => {
 
         try {
             // Fetch current leaderboard BEFORE saving so we can compare
-            const scoresRes = await fetch("http://localhost:5000/top-scores");
+            const scoresRes = await fetch("/top-scores");
             const currentScores: { username: string; accuracy: number }[] = await scoresRes.json();
             const currentBest = currentScores.length > 0 ? currentScores[0].accuracy : 0;
             setPrevTopScore(currentBest);
 
-            const response = await fetch("http://localhost:5000/start-training", {
+            const response = await fetch("/start-training", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ sortedImages: finalSortedImages })
@@ -195,7 +195,7 @@ const TrainingPage = () => {
 
             setTrainingResult(`${accuracy}`);
             await saveSession(accuracy, finalSortedImages);
-            await fetch("http://localhost:5000/save-score", {
+            await fetch("/save-score", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ username, accuracy, overwrite: true })
@@ -339,8 +339,8 @@ const TrainingPage = () => {
                                         <div className="score-value"><span>{accuracyNum}</span>%</div>
                                         <p className="score-subtitle">
                                             {accuracyNum >= 80 ? "Excellent classification! 🎉" :
-                                                accuracyNum >= 60 ? "Good effort, keep practising!" :
-                                                    "Nice try, the AI is learning from you!"}
+                                                accuracyNum >= 60 ? "Good effort — keep practising!" :
+                                                    "Nice try — the AI is learning from you!"}
                                         </p>
                                     </>
                                 ) : (

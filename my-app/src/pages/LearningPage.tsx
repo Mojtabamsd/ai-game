@@ -56,7 +56,7 @@ const LearningPage = () => {
 
     const loadNewQuizImage = async () => {
         try {
-            const response = await fetch("http://localhost:5000/random-image");
+            const response = await fetch("/random-image");
             const data = await response.json();
             if (data.error) return;
             setQuizImage(data.image);
