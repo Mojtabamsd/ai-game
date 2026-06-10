@@ -16,6 +16,9 @@ if (process.env.NODE_ENV === "production") {
     app.use(express.static(path.join(__dirname, "../build")));
 }
 
+// Always serve dataset images as static files
+app.use(express.static(path.join(__dirname, "../public")));
+
 const DATASET_PATH = path.join(__dirname, "../public/dataset");
 const DATASET_PATH_TRAIN = path.join(__dirname, "../public/dataset/train");
 const DATASET_PATH_TEST = path.join(__dirname, "../public/dataset/test");
@@ -34,32 +37,32 @@ db.pragma("journal_mode = WAL");
 
 db.exec(`
     CREATE TABLE IF NOT EXISTS scores (
-                                          id          INTEGER PRIMARY KEY AUTOINCREMENT,
-                                          username    TEXT    NOT NULL UNIQUE,
-                                          accuracy    REAL    NOT NULL,
-                                          timestamp   TEXT    NOT NULL
+        id          INTEGER PRIMARY KEY AUTOINCREMENT,
+        username    TEXT    NOT NULL UNIQUE,
+        accuracy    REAL    NOT NULL,
+        timestamp   TEXT    NOT NULL
     );
 
     CREATE TABLE IF NOT EXISTS sessions (
-                                            id          INTEGER PRIMARY KEY AUTOINCREMENT,
-                                            session_id  TEXT    NOT NULL UNIQUE,
-                                            username    TEXT    NOT NULL,
-                                            accuracy    REAL    NOT NULL,
-                                            total_images INTEGER NOT NULL,
-                                            time_taken  INTEGER NOT NULL,
-                                            timestamp   TEXT    NOT NULL
+        id          INTEGER PRIMARY KEY AUTOINCREMENT,
+        session_id  TEXT    NOT NULL UNIQUE,
+        username    TEXT    NOT NULL,
+        accuracy    REAL    NOT NULL,
+        total_images INTEGER NOT NULL,
+        time_taken  INTEGER NOT NULL,
+        timestamp   TEXT    NOT NULL
     );
 
     CREATE TABLE IF NOT EXISTS selections (
-                                              id              INTEGER PRIMARY KEY AUTOINCREMENT,
-                                              session_id      TEXT    NOT NULL,
-                                              username        TEXT    NOT NULL,
-                                              image_path      TEXT    NOT NULL,
-                                              true_category   TEXT    NOT NULL,
-                                              user_category   TEXT    NOT NULL,
-                                              correct         INTEGER NOT NULL,   -- 1 = correct, 0 = wrong
-                                              FOREIGN KEY (session_id) REFERENCES sessions(session_id)
-        );
+        id              INTEGER PRIMARY KEY AUTOINCREMENT,
+        session_id      TEXT    NOT NULL,
+        username        TEXT    NOT NULL,
+        image_path      TEXT    NOT NULL,
+        true_category   TEXT    NOT NULL,
+        user_category   TEXT    NOT NULL,
+        correct         INTEGER NOT NULL,   -- 1 = correct, 0 = wrong
+        FOREIGN KEY (session_id) REFERENCES sessions(session_id)
+    );
 
     CREATE INDEX IF NOT EXISTS idx_sessions_username  ON sessions(username);
     CREATE INDEX IF NOT EXISTS idx_selections_session ON selections(session_id);
@@ -71,9 +74,9 @@ const stmts = {
     upsertScore: db.prepare(`
         INSERT INTO scores (username, accuracy, timestamp)
         VALUES (@username, @accuracy, @timestamp)
-            ON CONFLICT(username) DO UPDATE SET
+        ON CONFLICT(username) DO UPDATE SET
             accuracy  = CASE WHEN excluded.accuracy > scores.accuracy THEN excluded.accuracy ELSE scores.accuracy END,
-                                         timestamp = CASE WHEN excluded.accuracy > scores.accuracy THEN excluded.timestamp ELSE scores.timestamp END
+            timestamp = CASE WHEN excluded.accuracy > scores.accuracy THEN excluded.timestamp ELSE scores.timestamp END
     `),
     topScores: db.prepare(`
         SELECT username, accuracy FROM scores ORDER BY accuracy DESC LIMIT 6
