@@ -2,7 +2,7 @@
 
 services:
   plankton-app:
-#    image: mojmas/plankton-ai:v1.0
+    image: mojmas/plankton-ai:v1.2
     build: .
     ports:
       - "5000:5000"
