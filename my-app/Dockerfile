@@ -47,6 +47,8 @@ RUN npm ci --omit=dev
 # Create mount point for persistent database
 RUN mkdir -p /data
 
+ENV NODE_ENV=production
+
 EXPOSE 5000
 
 CMD ["node", "server/server.js"]
