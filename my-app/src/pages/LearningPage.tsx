@@ -5,7 +5,7 @@ import "./LearningPage.css";
 const categories = ["Copepods", "Foraminifera", "Jellyfish", "Marine Snow"];
 
 const categoryDescriptions: { [key: string]: string } = {
-    "Copepods": "Tiny crustaceans and the most numerous animals in the ocean! Copepods are the \"insects of the sea\" — fast, abundant, and vital food for fish, whales, and seabirds.",
+    "Copepods": "Tiny crustaceans and the most numerous animals in the ocean! Copepods are the \"insects of the sea\", fast, abundant, and vital food for fish, whales, and seabirds.",
     "Foraminifera": "Single-celled organisms with beautiful, shell-like structures. These \"living sand grains\" help scientists study past climates from the seafloor.",
     "Jellyfish": "This group includes jellyfish and other gelatinous drifters. With stinging cells and graceful movements, they're both mesmerising and mysterious.",
     "Marine Snow": "Made of dead plankton, waste, and organic debris, Marine Snow drifts down the water column and feeds life in the deep sea."

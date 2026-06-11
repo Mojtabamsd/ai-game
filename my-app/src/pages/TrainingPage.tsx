@@ -339,8 +339,8 @@ const TrainingPage = () => {
                                         <div className="score-value"><span>{accuracyNum}</span>%</div>
                                         <p className="score-subtitle">
                                             {accuracyNum >= 80 ? "Excellent classification! 🎉" :
-                                                accuracyNum >= 60 ? "Good effort — keep practising!" :
-                                                    "Nice try — the AI is learning from you!"}
+                                                accuracyNum >= 60 ? "Good effort, keep practising!" :
+                                                    "Nice try, the AI is learning from you!"}
                                         </p>
                                     </>
                                 ) : (
