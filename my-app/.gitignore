@@ -5,6 +5,7 @@
 /.pnp
 .pnp.js
 /public/dataset
+data
 
 # testing
 /coverage
